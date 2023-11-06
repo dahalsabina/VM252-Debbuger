@@ -1,13 +1,100 @@
 /*
+ * 
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package DebugFrame;
+package gui;
+import java.util.Scanner;
+
+import vm252simulation.VM252Model;
+import vm252simulation.VM252View;
+
+import java.io.IOException;
+import java.util.Scanner;
 
 /**
  * 
- * @author abbyw
+ * @author : Abigail Wood, Sabina Dahal, and Supreme Paudel
  */
+
+class accumulatorPrinter extends VM252View {
+         
+    private final VM252Model myModel;
+    
+    public accumulatorPrinter(VM252Model model)
+    {       
+        myModel = model;       
+        }
+    
+    @Override
+    public void updateAccumulator()
+    {       
+        System.out.println("accumulator is now " + myModel.accumulator());        
+        // to do : to update the gui value
+        }
+    
+    }
+
+class ProgramCounterPrinter extends VM252View
+    {
+    
+    private final VM252Model myModel;
+    
+    public ProgramCounterPrinter(VM252Model model)
+    {        
+        myModel = model;        
+        }
+    
+    @Override
+    public void updateProgramCounter()
+    {        
+        System.out.println("program counter is now " + myModel.programCounter());        
+        // TO DO: update program counter text field as program is running
+        }
+    
+    }
+
+class MemoryBytePrinter extends VM252View
+    {
+    
+    private final VM252Model myModel;
+    
+    public MemoryBytePrinter(VM252Model model)
+    {        
+        myModel = model;        
+        }
+    
+    @Override
+    public void updateMemory(int address)
+    {        
+        System.out.printf("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));        
+        // TO DO : UPDATE GUI WITH MEMORY ADDRESS
+        }
+    
+    }
+
+class StopAnnouncer extends VM252View
+    {
+    
+    private final VM252Model myModel;
+    
+    public StopAnnouncer(VM252Model model)
+    {        
+        myModel = model;        
+        }
+    
+    @Override
+    public void updateStoppedStatus()
+    {        
+        // TO DO : UPDATE GUI AFTER PROGRAM HAS ENDED
+        System.out.printf(
+            "machine stops with accumulator %d and program counter %d\n",
+                myModel.accumulator(),
+                myModel.programCounter()
+            );        
+        }
+    }
+
 public class DebugFrame extends javax.swing.JFrame {
 
     /**
@@ -572,7 +659,7 @@ public class DebugFrame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException{
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -602,6 +689,22 @@ public class DebugFrame extends javax.swing.JFrame {
                 new DebugFrame().setVisible(true);
             }
         });
+
+    Scanner inputStream = new Scanner(System.in);
+        
+    VM252Model simulatedMachine = new VM252Model();
+        
+    simulatedMachine.attach(new accumulatorPrinter(simulatedMachine));
+    simulatedMachine.attach(new ProgramCounterPrinter(simulatedMachine));
+    simulatedMachine.attach(new MemoryBytePrinter(simulatedMachine));
+    simulatedMachine.attach(new StopAnnouncer(simulatedMachine));
+
+    guiController simulator = new guiController(simulatedMachine);
+
+    System.out.println("Enter the name of a VM252 object file to run:");
+    String objectFileName = inputStream.next();
+
+    simulator.loadAndRun(objectFileName, inputStream, System.out);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -648,4 +751,6 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane output_scroll;
     private javax.swing.JButton selectFile;
     // End of variables declaration//GEN-END:variables
+
+
 }
