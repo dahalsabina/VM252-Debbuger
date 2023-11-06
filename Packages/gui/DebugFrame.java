@@ -6,9 +6,14 @@
 package gui;
 import java.util.Scanner;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
 
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -97,6 +102,7 @@ class StopAnnouncer extends VM252View
 
 public class DebugFrame extends javax.swing.JFrame {
 
+    final JFileChooser fileChooser = new JFileChooser();
     /**
      * Creates new form DebugFrame
      */
@@ -173,7 +179,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         file_Selected.setEditable(false);
         file_Selected.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        file_Selected.setText("file selected");
+        file_Selected.setText("No file selected");
         file_Selected.setAutoscrolls(false);
         file_Selected.setBorder(null);
         file_Selected.setFocusable(false);
@@ -641,7 +647,24 @@ public class DebugFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_HelpActionPerformed
 
     private void selectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFileActionPerformed
-        // TODO add your handling code here:
+
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        int result = fileChooser.showOpenDialog(fileChooser);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            String selectedFileName = selectedFile.getName();
+            System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+            if (selectedFileName.endsWith(".vm252obj")) 
+            {
+            System.out.println("valid file");
+            file_Selected.setText(selectedFile.getName());
+        }
+            else {System.out.print("Invalid file");
+            JOptionPane.showMessageDialog(this, "File must end with .vm252obj");  
+        }
+        } else {
+        file_Selected.setText("No file selected");
+                }
     }//GEN-LAST:event_selectFileActionPerformed
 
     private void executeAgainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeAgainActionPerformed
