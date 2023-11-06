@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
 
+import static java.awt.Window.log;
 
 import java.io.File;
 import java.io.IOException;
@@ -103,6 +104,8 @@ class StopAnnouncer extends VM252View
 public class DebugFrame extends javax.swing.JFrame {
 
     final JFileChooser fileChooser = new JFileChooser();
+    String objFileName = "";
+    static guiController simulator;
     /**
      * Creates new form DebugFrame
      */
@@ -207,7 +210,7 @@ public class DebugFrame extends javax.swing.JFrame {
         Pause.setActionCommand("Pause");
         Pause.setLabel("Pause");
 
-        next_Line.setText("Next Line");
+        next_Line.setText("Next line");
 
         executeAgain.setText("Again");
         executeAgain.addActionListener(new java.awt.event.ActionListener() {
@@ -309,7 +312,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         count_diplay.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         count_diplay.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        count_diplay.setText("###");
+        count_diplay.setText("0");
         count_diplay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 count_diplayActionPerformed(evt);
@@ -345,7 +348,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         accumulator_display.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         accumulator_display.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        accumulator_display.setText("###");
+        accumulator_display.setText("0");
 
         javax.swing.GroupLayout Middle_CenterLayout = new javax.swing.GroupLayout(Middle_Center);
         Middle_Center.setLayout(Middle_CenterLayout);
@@ -638,7 +641,22 @@ public class DebugFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_memory_options_twoActionPerformed
 
-    private void StartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartActionPerformed
+    private void StartActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
+        try {
+            System.out.println(file_Selected.getText());
+        if (file_Selected.getText().equals("No file selected")){
+            JOptionPane.showMessageDialog(this, "Select a file first");
+        } else {
+            System.out.println("Running file named"+ objFileName);
+            String input_value = accumulator_display.getText();
+            Scanner scanner_object = new Scanner(input_value);
+            // TO DO what to pass here , not sure
+            simulator.loadAndRun(objFileName, scanner_object, System.out);
+
+        }}
+        catch (IOException e){
+    System.out.println("IO Exception");
+}
         // TODO add your handling code here:
     }//GEN-LAST:event_StartActionPerformed
 
@@ -656,11 +674,14 @@ public class DebugFrame extends javax.swing.JFrame {
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());
             if (selectedFileName.endsWith(".vm252obj")) 
             {
-            System.out.println("valid file");
+             // System.out.println("valid file");
             file_Selected.setText(selectedFile.getName());
+            objFileName = selectedFile.getAbsolutePath();
         }
-            else {System.out.print("Invalid file");
+            else {
+                //System.out.print("Invalid file");
             JOptionPane.showMessageDialog(this, "File must end with .vm252obj");  
+            objFileName = "";
         }
         } else {
         file_Selected.setText("No file selected");
@@ -713,8 +734,6 @@ public class DebugFrame extends javax.swing.JFrame {
             }
         });
 
-    Scanner inputStream = new Scanner(System.in);
-        
     VM252Model simulatedMachine = new VM252Model();
         
     simulatedMachine.attach(new accumulatorPrinter(simulatedMachine));
@@ -722,12 +741,9 @@ public class DebugFrame extends javax.swing.JFrame {
     simulatedMachine.attach(new MemoryBytePrinter(simulatedMachine));
     simulatedMachine.attach(new StopAnnouncer(simulatedMachine));
 
-    guiController simulator = new guiController(simulatedMachine);
+    simulator = new guiController(simulatedMachine);
 
     System.out.println("Enter the name of a VM252 object file to run:");
-    String objectFileName = inputStream.next();
-
-    simulator.loadAndRun(objectFileName, inputStream, System.out);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -774,6 +790,10 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane output_scroll;
     private javax.swing.JButton selectFile;
     // End of variables declaration//GEN-END:variables
+
+    private Scanner Scanner(String input_value) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
 
 }
