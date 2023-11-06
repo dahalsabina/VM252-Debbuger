@@ -12,11 +12,9 @@ import javax.swing.JOptionPane;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
 
-import static java.awt.Window.log;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
 
 /**
  * 
@@ -35,11 +33,16 @@ class accumulatorPrinter extends VM252View {
     @Override
     public void updateAccumulator()
     {       
-        System.out.println("accumulator is now " + myModel.accumulator()); 
+        System.out.println("accumulators is now " + myModel.accumulator()); 
         DebugFrame.accumulator_display.setText(""+myModel.accumulator());
         // to do : to update the gui value
         }
     
+    public void setAccumulator(int value){
+        
+        myModel.setAccumulator(value);
+    
+    }
     }
 
 class ProgramCounterPrinter extends VM252View
@@ -58,6 +61,13 @@ class ProgramCounterPrinter extends VM252View
         System.out.println("program counter is now " + myModel.programCounter());  
         DebugFrame.count_diplay.setText(""+myModel.programCounter());
         } 
+    
+    
+    public void setProgramCounter(int value){
+        
+        myModel.setProgramCounter(value);
+    
+    }
     
     }
 
@@ -107,6 +117,8 @@ public class DebugFrame extends javax.swing.JFrame {
     final JFileChooser fileChooser = new JFileChooser();
     String objFileName = "";
     static guiController simulator;
+    static accumulatorPrinter accumulatorPrinterObject;
+    static ProgramCounterPrinter programCounterPrinterObject;
     /**
      * Creates new form DebugFrame
      */
@@ -350,7 +362,12 @@ public class DebugFrame extends javax.swing.JFrame {
         accumulator_display.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         accumulator_display.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         accumulator_display.setText("0");
-
+        accumulator_display.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AccumulatorChangeActionPerfomed(evt);
+            }
+        });
+        
         javax.swing.GroupLayout Middle_CenterLayout = new javax.swing.GroupLayout(Middle_Center);
         Middle_Center.setLayout(Middle_CenterLayout);
         Middle_CenterLayout.setHorizontalGroup(
@@ -665,6 +682,11 @@ public class DebugFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_HelpActionPerformed
 
+    private void AccumulatorChangeActionPerfomed(java.awt.event.ActionEvent evt){
+        String new_value = accumulator_display.getText();
+        accumulatorPrinterObject.setAccumulator(Integer.parseInt(new_value));
+    }
+    
     private void selectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFileActionPerformed
 
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -699,6 +721,9 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void count_diplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_count_diplayActionPerformed
         // TODO add your handling code here:
+        String new_value = count_diplay.getText();
+        programCounterPrinterObject.setProgramCounter(Integer.parseInt(new_value));
+    
     }//GEN-LAST:event_count_diplayActionPerformed
 
     /**
@@ -736,15 +761,15 @@ public class DebugFrame extends javax.swing.JFrame {
         });
 
     VM252Model simulatedMachine = new VM252Model();
-        
-    simulatedMachine.attach(new accumulatorPrinter(simulatedMachine));
-    simulatedMachine.attach(new ProgramCounterPrinter(simulatedMachine));
+    accumulatorPrinterObject = new accumulatorPrinter(simulatedMachine);
+    programCounterPrinterObject = new ProgramCounterPrinter(simulatedMachine);
+    simulatedMachine.attach(accumulatorPrinterObject);
+    simulatedMachine.attach(programCounterPrinterObject);
     simulatedMachine.attach(new MemoryBytePrinter(simulatedMachine));
     simulatedMachine.attach(new StopAnnouncer(simulatedMachine));
 
     simulator = new guiController(simulatedMachine);
 
-    System.out.println("Enter the name of a VM252 object file to run:");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
