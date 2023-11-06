@@ -35,7 +35,8 @@ class accumulatorPrinter extends VM252View {
     @Override
     public void updateAccumulator()
     {       
-        System.out.println("accumulator is now " + myModel.accumulator());        
+        System.out.println("accumulator is now " + myModel.accumulator()); 
+        DebugFrame.accumulator_display.setText(""+myModel.accumulator());
         // to do : to update the gui value
         }
     
@@ -54,9 +55,9 @@ class ProgramCounterPrinter extends VM252View
     @Override
     public void updateProgramCounter()
     {        
-        System.out.println("program counter is now " + myModel.programCounter());        
-        // TO DO: update program counter text field as program is running
-        }
+        System.out.println("program counter is now " + myModel.programCounter());  
+        DebugFrame.count_diplay.setText(""+myModel.programCounter());
+        } 
     
     }
 
@@ -767,9 +768,9 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JPanel Top_Bottom_East;
     private javax.swing.JPanel Upper_Panel;
     private javax.swing.JLabel accumulator;
-    private javax.swing.JTextField accumulator_display;
+    public static javax.swing.JTextField accumulator_display;
     private javax.swing.JComboBox<String> adjust_Speed;
-    private javax.swing.JTextField count_diplay;
+    public static javax.swing.JTextField count_diplay;
     private javax.swing.JTextArea enter_input;
     private javax.swing.JButton executeAgain;
     private javax.swing.JTextField file_Selected;
