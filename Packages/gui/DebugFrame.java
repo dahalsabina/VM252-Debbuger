@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
 
-
 import java.io.File;
 import java.io.IOException;
 
@@ -119,6 +118,7 @@ public class DebugFrame extends javax.swing.JFrame {
     static guiController simulator;
     static accumulatorPrinter accumulatorPrinterObject;
     static ProgramCounterPrinter programCounterPrinterObject;
+
     /**
      * Creates new form DebugFrame
      */
@@ -191,7 +191,8 @@ public class DebugFrame extends javax.swing.JFrame {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 selectFileActionPerformed(evt);
             }
-        });
+        }
+        );
 
         file_Selected.setEditable(false);
         file_Selected.setHorizontalAlignment(javax.swing.JTextField.LEFT);
@@ -224,6 +225,11 @@ public class DebugFrame extends javax.swing.JFrame {
         Pause.setLabel("Pause");
 
         next_Line.setText("Next line");
+        next_Line.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt){
+                NextActionPerformed(evt);
+            }
+        });
 
         executeAgain.setText("Again");
         executeAgain.addActionListener(new java.awt.event.ActionListener() {
@@ -659,6 +665,26 @@ public class DebugFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_memory_options_twoActionPerformed
 
+    private void NextActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
+        try {
+            System.out.println(file_Selected.getText());
+            if (file_Selected.getText().equals("No file selected")){
+            JOptionPane.showMessageDialog(this, "Select a file first");
+            } else {
+            System.out.println("Next instruction for file named"+ objFileName);
+            // TO DO what to pass here , not sure
+            String input_value = accumulator_display.getText();
+            Scanner scanner_object = new Scanner(input_value);
+            // TO DO what to pass here , not sure
+            simulator.loadAndRun(objFileName, scanner_object, System.out, "next");
+        }
+    }
+        catch (IOException e){
+    System.out.println("IO Exception");
+}
+        // TODO add your handling code here:
+    }//GEN-LAST:event_StartActionPerformed
+
     private void StartActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
         try {
             System.out.println(file_Selected.getText());
@@ -669,7 +695,7 @@ public class DebugFrame extends javax.swing.JFrame {
             String input_value = accumulator_display.getText();
             Scanner scanner_object = new Scanner(input_value);
             // TO DO what to pass here , not sure
-            simulator.loadAndRun(objFileName, scanner_object, System.out);
+            simulator.loadAndRun(objFileName, scanner_object, System.out, "run");
 
         }}
         catch (IOException e){
@@ -687,6 +713,19 @@ public class DebugFrame extends javax.swing.JFrame {
         accumulatorPrinterObject.setAccumulator(Integer.parseInt(new_value));
     }
     
+    private void create_simulation_machine(){
+
+    VM252Model simulatedMachine = new VM252Model();
+    accumulatorPrinterObject = new accumulatorPrinter(simulatedMachine);
+    programCounterPrinterObject = new ProgramCounterPrinter(simulatedMachine);
+    simulatedMachine.attach(accumulatorPrinterObject);
+    simulatedMachine.attach(programCounterPrinterObject);
+    simulatedMachine.attach(new MemoryBytePrinter(simulatedMachine));
+    simulatedMachine.attach(new StopAnnouncer(simulatedMachine));
+
+    simulator = new guiController(simulatedMachine);
+    }
+
     private void selectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFileActionPerformed
 
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -700,6 +739,9 @@ public class DebugFrame extends javax.swing.JFrame {
              // System.out.println("valid file");
             file_Selected.setText(selectedFile.getName());
             objFileName = selectedFile.getAbsolutePath();
+            accumulator_display.setText("0");
+            count_diplay.setText("0");
+            create_simulation_machine();
         }
             else {
                 //System.out.print("Invalid file");
@@ -760,15 +802,6 @@ public class DebugFrame extends javax.swing.JFrame {
             }
         });
 
-    VM252Model simulatedMachine = new VM252Model();
-    accumulatorPrinterObject = new accumulatorPrinter(simulatedMachine);
-    programCounterPrinterObject = new ProgramCounterPrinter(simulatedMachine);
-    simulatedMachine.attach(accumulatorPrinterObject);
-    simulatedMachine.attach(programCounterPrinterObject);
-    simulatedMachine.attach(new MemoryBytePrinter(simulatedMachine));
-    simulatedMachine.attach(new StopAnnouncer(simulatedMachine));
-
-    simulator = new guiController(simulatedMachine);
 
     }
 
