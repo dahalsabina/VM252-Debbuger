@@ -119,6 +119,7 @@ public class DebugFrame extends javax.swing.JFrame {
     static guiController simulator;
     static accumulatorPrinter accumulatorPrinterObject;
     static ProgramCounterPrinter programCounterPrinterObject;
+    static String instruction_to_be_executed;
     /**
      * Creates new form DebugFrame
      */
@@ -802,7 +803,7 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JTextArea input_code_area;
     private javax.swing.JScrollPane input_code_scroll;
     private javax.swing.JScrollPane input_scroll;
-    private javax.swing.JTextField instruction_Display;
+    public static javax.swing.JTextField instruction_Display;
     private javax.swing.JComboBox<String> jComboBox3;
     private javax.swing.JTextArea memory_display_one;
     private javax.swing.JScrollPane memory_display_scroll_one;

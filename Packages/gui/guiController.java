@@ -136,8 +136,10 @@ public class guiController
 
                     while (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
-                        machineStepper().step();
-
+                        {machineStepper().step();
+                        DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
+                        DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                        }
                 }
 
             }
