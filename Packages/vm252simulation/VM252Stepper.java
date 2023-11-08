@@ -133,6 +133,27 @@ public class VM252Stepper
         //     none
         //
 
+        public String current_instruction(){
+
+            Instruction currentInstruction;
+            try {
+
+                currentInstruction
+                    = new VM252ArchitectureSpecifications.Instruction(
+                        fetchMemoryBytes(machineState().programCounter(), 2)
+                        );
+
+                        }
+            catch (IllegalArgumentException exception) {
+
+                currentInstruction
+                    = new VM252ArchitectureSpecifications.Instruction(
+                        fetchMemoryBytes(machineState().programCounter(), 1)
+                        );
+                        }
+            return currentInstruction.symbolicOpcode();
+        }
+
         public void step() throws IOException
         {
 

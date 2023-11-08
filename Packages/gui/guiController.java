@@ -20,7 +20,8 @@ public class guiController
 
         private VM252Model myMachineState;
         private VM252Stepper myMachineStepper;
-
+        private boolean simulation_started;
+        private boolean simulation_paused;
     //
     // Public Accessors
     //
@@ -63,7 +64,8 @@ public class guiController
 
         public guiController(VM252Model simulatedMachine)
         {
-
+            this.simulation_started = false;
+            this.simulation_paused = false;
             setMachineState(simulatedMachine);
 
             }
@@ -108,9 +110,14 @@ public class guiController
         public void loadAndRun(
             String objectFileName,
             Scanner machineInputStream,
-            PrintStream machineOutputStream
+            PrintStream machineOutputStream,
+            String type_of_run
             ) throws IOException
         {
+            if (this.simulation_started == false){
+    
+            this.simulation_started = true;
+            this.simulation_paused = false;
 
             byte [ ] objectCode
                 = VM252Utilities.readObjectCodeFromObjectFile(objectFileName);
@@ -134,13 +141,46 @@ public class guiController
                 // executes a STOP instruction
                 //
 
+                if (type_of_run.equals("run")) {
                     while (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
-                        machineStepper().step();
-
+                        {machineStepper().step();
+                        DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
+                        DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                        }
+                    }
+                else if (type_of_run.equals("next")){
+                    do_next_instruction();
+                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
+                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
                 }
-
+                }}
+            else {
+                if (type_of_run.equals("run")) {
+                    while (machineState().stoppedStatus()
+                            == VM252Model.StoppedCategory.notStopped)
+                        {machineStepper().step();
+                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
+                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                    }
+                    }
+                else if (type_of_run.equals("next")){
+                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
+                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                    do_next_instruction();
+                }
+                }
             }
+
+        public void do_next_instruction() throws IOException
+            {
+                if (machineState().stoppedStatus()
+                            == VM252Model.StoppedCategory.notStopped)
+                        {machineStepper().step();
+                        System.out.println("YESS simulation has started man");
+                } else {
+                }
+                }
 
     }
 
