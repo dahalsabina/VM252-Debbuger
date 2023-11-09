@@ -14,6 +14,9 @@ import vm252simulation.VM252View;
 
 import java.io.File;
 import java.io.IOException;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+
 
 /**
  * 
@@ -80,13 +83,16 @@ class MemoryBytePrinter extends VM252View
         myModel = model;        
         }
     
-    @Override
+   @Override
     public void updateMemory(int address)
     {        
         System.out.printf("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));        
-        // TO DO : UPDATE GUI WITH MEMORY ADDRESS
+      
+        String formattedString = String.format("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));
+        DebugFrame.output_display.append(formattedString);       
+
         }
-    
+
     }
 
 class StopAnnouncer extends VM252View
@@ -119,6 +125,7 @@ public class DebugFrame extends javax.swing.JFrame {
     static accumulatorPrinter accumulatorPrinterObject;
     static ProgramCounterPrinter programCounterPrinterObject;
     static String instruction_to_be_executed;
+    VM252Model simulatedMachine;
     /**
      * Creates new form DebugFrame
      */
@@ -231,11 +238,21 @@ public class DebugFrame extends javax.swing.JFrame {
         });
 
         executeAgain.setText("Again");
-        executeAgain.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                executeAgainActionPerformed(evt);
-            }
+        executeAgain.addActionListener((ActionEvent e) -> {
+            EventQueue.invokeLater(
+                    () -> {
+                        
+                        // Updates the program to stop execution of the object code 
+                        
+                        simulatedMachine.setAccumulator(0);
+                        simulatedMachine.setProgramCounter(0);
+                       
+                        
+                        
+
+                    });
         });
+
 
         Stop.setText("Stop");
 
@@ -484,7 +501,7 @@ public class DebugFrame extends javax.swing.JFrame {
         input_scroll.setViewportView(enter_input);
         enter_input.getAccessibleContext().setAccessibleParent(Bottom_West);
 
-        output_scroll.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        output_scroll.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         output_display.setColumns(20);
         output_display.setRows(5);
@@ -844,7 +861,7 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> memory_options_two;
     private javax.swing.JLabel next_Instruction;
     private javax.swing.JButton next_Line;
-    private javax.swing.JTextArea output_display;
+    public static javax.swing.JTextArea output_display;
     private javax.swing.JScrollPane output_scroll;
     private javax.swing.JButton selectFile;
     // End of variables declaration//GEN-END:variables
