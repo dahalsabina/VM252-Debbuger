@@ -89,7 +89,7 @@ class MemoryBytePrinter extends VM252View
         System.out.printf("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));        
       
         String formattedString = String.format("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));
-        DebugFrame.output_display.append(formattedString);       
+        DebugFrame. memory_display_one.append(formattedString);       
 
         }
 
@@ -238,21 +238,15 @@ public class DebugFrame extends javax.swing.JFrame {
         });
 
         executeAgain.setText("Again");
-        executeAgain.addActionListener((ActionEvent e) -> {
-            EventQueue.invokeLater(
-                    () -> {
-                        
-                        // Updates the program to stop execution of the object code 
-                        
-                        simulatedMachine.setAccumulator(0);
-                        simulatedMachine.setProgramCounter(0);
-                       
-                        
-                        
-
-                    });
+        executeAgain.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                executeAgainActionPerformed(evt);
+            }
         });
-
+       
+        
+        
+        
 
         Stop.setText("Stop");
 
@@ -767,13 +761,22 @@ public class DebugFrame extends javax.swing.JFrame {
         } else {
         file_Selected.setText("No file selected");
                 }
-    }//GEN-LAST:event_selectFileActionPerformed
 
+        
+    }
     private void executeAgainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeAgainActionPerformed
-        // TODO add your handling code here:
+         programCounterPrinterObject.setProgramCounter(0);
+         accumulatorPrinterObject.setAccumulator(0);
+         simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
+        DebugFrame.memory_display_one.setText(" ");
+        DebugFrame.output_display.append( "Restarting file named"+ objFileName);
+
+       
     }//GEN-LAST:event_executeAgainActionPerformed
 
     private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
+       
+
         // TODO add your handling code here:
     }//GEN-LAST:event_SaveActionPerformed
 
@@ -853,11 +856,11 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane input_scroll;
     public static javax.swing.JTextField instruction_Display;
     private javax.swing.JComboBox<String> jComboBox3;
-    private javax.swing.JTextArea memory_display_one;
-    private javax.swing.JScrollPane memory_display_scroll_one;
-    private javax.swing.JScrollPane memory_display_scroll_two;
+    public static javax.swing.JTextArea memory_display_one;
+    public static javax.swing.JScrollPane memory_display_scroll_one;
+    public static javax.swing.JScrollPane memory_display_scroll_two;
     private javax.swing.JTextArea memory_display_two;
-    private javax.swing.JComboBox<String> memory_options_one;
+    public static javax.swing.JComboBox<String> memory_options_one;
     private javax.swing.JComboBox<String> memory_options_two;
     private javax.swing.JLabel next_Instruction;
     private javax.swing.JButton next_Line;
