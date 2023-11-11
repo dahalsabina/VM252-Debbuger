@@ -89,7 +89,7 @@ class MemoryBytePrinter extends VM252View
         System.out.printf("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));        
       
         String formattedString = String.format("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));
-        DebugFrame. memory_display_one.append(formattedString);       
+        DebugFrame.input_code_area.append(formattedString);       
 
         }
 
@@ -768,10 +768,11 @@ public class DebugFrame extends javax.swing.JFrame {
          programCounterPrinterObject.setProgramCounter(0);
          accumulatorPrinterObject.setAccumulator(0);
          simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
-        DebugFrame.memory_display_one.setText(" ");
-        DebugFrame.output_display.append( "Restarting file named"+ objFileName);
-
+        DebugFrame.input_code_area.setText(" ");
+        file_Selected.setText("No file selected");
+        objFileName = "";
        
+        
     }//GEN-LAST:event_executeAgainActionPerformed
 
     private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
@@ -851,7 +852,7 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JTextArea enter_input;
     private javax.swing.JButton executeAgain;
     private javax.swing.JTextField file_Selected;
-    private javax.swing.JTextArea input_code_area;
+    public static  javax.swing.JTextArea input_code_area;
     private javax.swing.JScrollPane input_code_scroll;
     private javax.swing.JScrollPane input_scroll;
     public static javax.swing.JTextField instruction_Display;
