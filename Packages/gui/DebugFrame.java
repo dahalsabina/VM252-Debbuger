@@ -8,6 +8,8 @@ import java.util.Scanner;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
@@ -166,7 +168,8 @@ public class DebugFrame extends javax.swing.JFrame {
         Upper_Panel = new javax.swing.JPanel();
         selectFile = new javax.swing.JButton();
         file_Selected = new javax.swing.JTextField();
-        Help = new javax.swing.JButton();
+        Icon helpIcon = new ImageIcon("C: ./icons/Help_Icon.png");
+        Help = new javax.swing.JButton(helpIcon);
         Button_Panel = new javax.swing.JPanel();
         Start = new javax.swing.JButton();
         Pause = new javax.swing.JButton();
@@ -277,8 +280,7 @@ public class DebugFrame extends javax.swing.JFrame {
                 stopActionPerformed(evt);
             }
         });
-        
-
+       
         adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Speed", "Speed x1.5", "Speed x2" }));
 
         javax.swing.GroupLayout Button_PanelLayout = new javax.swing.GroupLayout(Button_Panel);
@@ -299,7 +301,6 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(adjust_Speed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(Save)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         Button_PanelLayout.setVerticalGroup(
@@ -815,11 +816,6 @@ public class DebugFrame extends javax.swing.JFrame {
         stopAnnouncerObject.machine_stopped_midway();
     }
 
-    private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
-       
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_SaveActionPerformed
 
     private void count_diplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_count_diplayActionPerformed
         // TODO add your handling code here:
@@ -880,7 +876,6 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JLabel Output_Value;
     private static javax.swing.JButton Pause;
     private javax.swing.JLabel Program_Counter;
-    private javax.swing.JButton Save;
     private static javax.swing.JButton Start;
     private static javax.swing.JButton Stop;
     private javax.swing.JPanel Top_Bottom_East;
