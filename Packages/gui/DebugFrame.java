@@ -6,7 +6,6 @@
 package gui;
 import java.util.Scanner;
 
-import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -15,7 +14,6 @@ import vm252simulation.VM252View;
 
 import java.io.File;
 import java.io.IOException;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -38,8 +36,8 @@ class accumulatorPrinter extends VM252View {
     public void updateAccumulator()
     {       
         System.out.println("accumulators is now " + myModel.accumulator()); 
+        // Update the gui value
         DebugFrame.accumulator_display.setText(""+myModel.accumulator());
-        // to do : to update the gui value
         }
     
     public void setAccumulator(int value){
@@ -112,13 +110,17 @@ class StopAnnouncer extends VM252View
         // TO DO : UPDATE GUI AFTER PROGRAM HAS ENDED
         // Disable all buttons except for restart
         // If new file chosen, then renable buttons
-        DebugFrame.enable_disable_buttons_fields(false);
-        System.out.printf(
-            "machine stops with accumulator %d and program counter %d\n",
-                myModel.accumulator(),
-                myModel.programCounter()
+        DebugFrame.reset_gui_components(false);
+        String output_line_1 = String.format("machine stops with accumulator %d and program counter %d\n", myModel.accumulator(), myModel.programCounter());
+        String output_line_2 = String.format("OUTPUT : %d", myModel.accumulator());
+        DebugFrame.output_display.setText(output_line_1 + output_line_2
             );        
         }
+    
+    public void machine_stopped_midway(){
+        String output_line_1 = String.format("machine stops with accumulator %d and program counter %d\n", myModel.accumulator(), myModel.programCounter());
+        DebugFrame.output_display.setText(output_line_1);
+    }
     }
 
 public class DebugFrame extends javax.swing.JFrame {
@@ -128,15 +130,18 @@ public class DebugFrame extends javax.swing.JFrame {
     static guiController simulator;
     static accumulatorPrinter accumulatorPrinterObject;
     static ProgramCounterPrinter programCounterPrinterObject;
+    static StopAnnouncer stopAnnouncerObject;
+    static MemoryBytePrinter memoryBytePrinterObject;
     static String instruction_to_be_executed;
     VM252Model simulatedMachine;
     
-    public static void enable_disable_buttons_fields(boolean enable){
+    public static void reset_gui_components(boolean enable){
         Start.setEnabled(enable);
         next_Line.setEnabled(enable);
         Stop.setEnabled(enable);
         Pause.setEnabled(enable);
 
+        DebugFrame.output_display.setText("");
         accumulator_display.setEditable(enable);
         count_diplay.setEditable(enable);
     }
@@ -522,6 +527,7 @@ public class DebugFrame extends javax.swing.JFrame {
         output_scroll.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         output_display.setColumns(20);
+        output_display.setEditable(false);
         output_display.setRows(5);
         output_scroll.setViewportView(output_display);
 
@@ -761,10 +767,12 @@ public class DebugFrame extends javax.swing.JFrame {
     simulatedMachine = new VM252Model();
     accumulatorPrinterObject = new accumulatorPrinter(simulatedMachine);
     programCounterPrinterObject = new ProgramCounterPrinter(simulatedMachine);
+    stopAnnouncerObject = new StopAnnouncer(simulatedMachine);
+    memoryBytePrinterObject = new MemoryBytePrinter(simulatedMachine);
     simulatedMachine.attach(accumulatorPrinterObject);
     simulatedMachine.attach(programCounterPrinterObject);
-    simulatedMachine.attach(new MemoryBytePrinter(simulatedMachine));
-    simulatedMachine.attach(new StopAnnouncer(simulatedMachine));
+    simulatedMachine.attach(memoryBytePrinterObject);
+    simulatedMachine.attach(stopAnnouncerObject);
 
     simulator = new guiController(simulatedMachine);
     }
@@ -785,7 +793,7 @@ public class DebugFrame extends javax.swing.JFrame {
             accumulator_display.setText("0");
             count_diplay.setText("0");
             create_simulation_machine();
-            enable_disable_buttons_fields(true);
+            reset_gui_components(true);
         }
             else {
                 //System.out.print("Invalid file");
@@ -804,13 +812,14 @@ public class DebugFrame extends javax.swing.JFrame {
          instruction_Display.setText("");
          DebugFrame.input_code_area.setText(" ");
          create_simulation_machine();
-         enable_disable_buttons_fields(true);
+         reset_gui_components(true);
        
         
     }//GEN-LAST:event_executeAgainActionPerformed
 
     private void stopActionPerformed(ActionEvent evt){
-        enable_disable_buttons_fields(false);
+        reset_gui_components(false);
+        stopAnnouncerObject.machine_stopped_midway();
     }
 
     private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
