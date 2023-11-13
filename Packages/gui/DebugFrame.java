@@ -6,6 +6,7 @@
 package gui;
 import java.util.Scanner;
 
+import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 /**
@@ -87,7 +89,6 @@ class MemoryBytePrinter extends VM252View
     public void updateMemory(int address)
     {        
         System.out.printf("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));        
-      
         String formattedString = String.format("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));
         DebugFrame.input_code_area.append(formattedString);       
 
@@ -109,6 +110,9 @@ class StopAnnouncer extends VM252View
     public void updateStoppedStatus()
     {        
         // TO DO : UPDATE GUI AFTER PROGRAM HAS ENDED
+        // Disable all buttons except for restart
+        // If new file chosen, then renable buttons
+        DebugFrame.enable_disable_buttons_fields(false);
         System.out.printf(
             "machine stops with accumulator %d and program counter %d\n",
                 myModel.accumulator(),
@@ -126,6 +130,17 @@ public class DebugFrame extends javax.swing.JFrame {
     static ProgramCounterPrinter programCounterPrinterObject;
     static String instruction_to_be_executed;
     VM252Model simulatedMachine;
+    
+    public static void enable_disable_buttons_fields(boolean enable){
+        Start.setEnabled(enable);
+        next_Line.setEnabled(enable);
+        Stop.setEnabled(enable);
+        Pause.setEnabled(enable);
+
+        accumulator_display.setEditable(enable);
+        count_diplay.setEditable(enable);
+    }
+
     /**
      * Creates new form DebugFrame
      */
@@ -227,8 +242,12 @@ public class DebugFrame extends javax.swing.JFrame {
             }
         });
 
-        Pause.setActionCommand("Pause");
-        Pause.setLabel("Pause");
+        Pause.setText("Pause");
+        Pause.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt){
+                PauseActionPerformed(evt);
+            }
+        });
 
         next_Line.setText("Next line");
         next_Line.addActionListener(new java.awt.event.ActionListener() {
@@ -249,7 +268,11 @@ public class DebugFrame extends javax.swing.JFrame {
         
 
         Stop.setText("Stop");
-
+        Stop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt){
+                stopActionPerformed(evt);
+            }
+        });
         Save.setText("Save");
         Save.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -415,7 +438,8 @@ public class DebugFrame extends javax.swing.JFrame {
 
         instruction_Display.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         instruction_Display.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        instruction_Display.setText("g#h");
+        instruction_Display.setEditable(false);
+        instruction_Display.setText("");
 
         javax.swing.GroupLayout Middle_EastLayout = new javax.swing.GroupLayout(Middle_East);
         Middle_East.setLayout(Middle_EastLayout);
@@ -695,6 +719,15 @@ public class DebugFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_StartActionPerformed
 
+    private void PauseActionPerformed(ActionEvent evt){
+            System.out.println(file_Selected.getText());
+        if (file_Selected.getText().equals("No file selected")){
+            JOptionPane.showMessageDialog(this, "Select a file first");
+        } else {
+            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.stopped);
+        }
+    }
+
     private void StartActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
         try {
             System.out.println(file_Selected.getText());
@@ -725,7 +758,7 @@ public class DebugFrame extends javax.swing.JFrame {
     
     private void create_simulation_machine(){
 
-    VM252Model simulatedMachine = new VM252Model();
+    simulatedMachine = new VM252Model();
     accumulatorPrinterObject = new accumulatorPrinter(simulatedMachine);
     programCounterPrinterObject = new ProgramCounterPrinter(simulatedMachine);
     simulatedMachine.attach(accumulatorPrinterObject);
@@ -752,6 +785,7 @@ public class DebugFrame extends javax.swing.JFrame {
             accumulator_display.setText("0");
             count_diplay.setText("0");
             create_simulation_machine();
+            enable_disable_buttons_fields(true);
         }
             else {
                 //System.out.print("Invalid file");
@@ -770,9 +804,14 @@ public class DebugFrame extends javax.swing.JFrame {
          instruction_Display.setText("");
          DebugFrame.input_code_area.setText(" ");
          create_simulation_machine();
+         enable_disable_buttons_fields(true);
        
         
     }//GEN-LAST:event_executeAgainActionPerformed
+
+    private void stopActionPerformed(ActionEvent evt){
+        enable_disable_buttons_fields(false);
+    }
 
     private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
        
@@ -837,11 +876,11 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JPanel Middle_Panel;
     private javax.swing.JPanel Middle_West;
     private javax.swing.JLabel Output_Value;
-    private javax.swing.JButton Pause;
+    private static javax.swing.JButton Pause;
     private javax.swing.JLabel Program_Counter;
     private javax.swing.JButton Save;
-    private javax.swing.JButton Start;
-    private javax.swing.JButton Stop;
+    private static javax.swing.JButton Start;
+    private static javax.swing.JButton Stop;
     private javax.swing.JPanel Top_Bottom_East;
     private javax.swing.JPanel Upper_Panel;
     private javax.swing.JLabel accumulator;
@@ -863,7 +902,7 @@ public class DebugFrame extends javax.swing.JFrame {
     public static javax.swing.JComboBox<String> memory_options_one;
     private javax.swing.JComboBox<String> memory_options_two;
     private javax.swing.JLabel next_Instruction;
-    private javax.swing.JButton next_Line;
+    private static javax.swing.JButton next_Line;
     public static javax.swing.JTextArea output_display;
     private javax.swing.JScrollPane output_scroll;
     private javax.swing.JButton selectFile;
