@@ -765,12 +765,11 @@ public class DebugFrame extends javax.swing.JFrame {
         
     }
     private void executeAgainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_executeAgainActionPerformed
-         programCounterPrinterObject.setProgramCounter(0);
-         accumulatorPrinterObject.setAccumulator(0);
-         simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
-        DebugFrame.input_code_area.setText(" ");
-        file_Selected.setText("No file selected");
-        objFileName = "";
+         count_diplay.setText("0");
+         accumulator_display.setText("0");
+         instruction_Display.setText("");
+         DebugFrame.input_code_area.setText(" ");
+         create_simulation_machine();
        
         
     }//GEN-LAST:event_executeAgainActionPerformed
