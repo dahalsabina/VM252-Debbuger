@@ -9,6 +9,7 @@ import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
+import gui.guiController.code_display;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +85,7 @@ class MemoryBytePrinter extends VM252View
     {        
         System.out.printf("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));        
         String formattedString = String.format("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));
-        DebugFrame.input_code_area.append(formattedString);       
+        DebugFrame.memory_display_one.append(formattedString);       
 
         }
 
@@ -116,6 +117,7 @@ class StopAnnouncer extends VM252View
 
         } else if (DebugFrame.simulatedMachine.stoppedStatus() == VM252Model.StoppedCategory.stopped){
         DebugFrame.reset_gui_components(false);
+        System.out.println("program ended");
         String output_line_1 = String.format("machine stops | ACC : %d | PC : %d\n", myModel.accumulator(), myModel.programCounter());
         DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ output_line_1 + "\n"
             );
@@ -125,6 +127,7 @@ class StopAnnouncer extends VM252View
     public void machine_stopped_midway(){
         String output_line_1 = String.format("machine stops | ACC : %d | PC : %d\n", myModel.accumulator(), myModel.programCounter());
         DebugFrame.event_display.setText(DebugFrame.event_display.getText() + output_line_1);
+
     }
     }
 
@@ -442,7 +445,7 @@ public class DebugFrame extends javax.swing.JFrame {
         next_Instruction.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         next_Instruction.setText("Next Instruction");
 
-        instruction_Display.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        instruction_Display.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         instruction_Display.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         instruction_Display.setEditable(false);
         instruction_Display.setText("");
@@ -490,6 +493,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         input_code_area.setColumns(20);
         input_code_area.setRows(5);
+        input_code_area.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
         input_code_scroll.setViewportView(input_code_area);
         input_code_area.getAccessibleContext().setAccessibleParent(Bottom_West);
 
@@ -708,11 +712,9 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void NextActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
         try {
-            System.out.println(file_Selected.getText());
             if (file_Selected.getText().equals("No file selected")){
             JOptionPane.showMessageDialog(this, "Select a file first");
             } else {
-            System.out.println("Next instruction for file named"+ objFileName);
             // TO DO what to pass here , not sure
             String input_value = accumulator_display.getText();
             Scanner scanner_object = new Scanner(input_value);
@@ -729,7 +731,6 @@ public class DebugFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_StartActionPerformed
 
     private void PauseActionPerformed(ActionEvent evt){
-            System.out.println(file_Selected.getText());
         if (file_Selected.getText().equals("No file selected")){
             JOptionPane.showMessageDialog(this, "Select a file first");
         } else {
@@ -740,7 +741,6 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void StartActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
         try {
-            System.out.println(file_Selected.getText());
         if (file_Selected.getText().equals("No file selected")){
             JOptionPane.showMessageDialog(this, "Select a file first");
         } else {
@@ -793,7 +793,6 @@ public class DebugFrame extends javax.swing.JFrame {
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());
             if (selectedFileName.endsWith(".vm252obj")) 
             {
-             // System.out.println("valid file");
             file_Selected.setText(selectedFile.getName());
             objFileName = selectedFile.getAbsolutePath();
             accumulator_display.setText("0");
@@ -816,7 +815,7 @@ public class DebugFrame extends javax.swing.JFrame {
          count_diplay.setText("0");
          accumulator_display.setText("0");
          instruction_Display.setText("");
-         DebugFrame.input_code_area.setText(" ");
+         DebugFrame.memory_display_one.setText(" ");
          create_simulation_machine();
          reset_gui_components(true);
        

@@ -5,10 +5,14 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Scanner;
 
-
+import vm252architecturespecifications.VM252ArchitectureSpecifications;
+import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
+import vm252simulation.VM252Model.StoppedCategory;
 import vm252utilities.VM252Utilities;
+
+
 
 
 public class guiController
@@ -22,6 +26,7 @@ public class guiController
         private VM252Stepper myMachineStepper;
         private boolean simulation_started;
         private boolean simulation_paused;
+        public code_display code_display_object;
     //
     // Public Accessors
     //
@@ -107,6 +112,16 @@ public class guiController
         //     none
         //
 
+        private void display_instruction(){
+
+            if (machineState().stoppedStatus() != VM252Model.StoppedCategory.stopped){
+            DebugFrame.instruction_to_be_executed = machineStepper().next_instruction(false, 0);
+            DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+            } else {
+            DebugFrame.instruction_Display.setText("");
+            }
+        }
+
         public void loadAndRun(
             String objectFileName,
             Scanner machineInputStream,
@@ -124,8 +139,8 @@ public class guiController
 
             if (objectCode != null) {
 
-                setMachineStepper(
-                    new VM252Stepper(machineState(), machineInputStream, machineOutputStream)
+            setMachineStepper(
+                new VM252Stepper(machineState(), machineInputStream, machineOutputStream)
                     );
 
                 //
@@ -145,41 +160,69 @@ public class guiController
                     while (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
-                        DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
-                        DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                        display_instruction();
                         }
                     }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
-                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
-                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                    display_instruction();
                 }
+
+                code_display_object = this.new code_display();
+                code_display_object.display_code_in_human_readable_format();
                 }}
             else {
                 if (type_of_run.equals("run")) {
                     while (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
-                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
-                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                    display_instruction();
                     }
                     }
                 else if (type_of_run.equals("next")){
-                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
-                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
                     do_next_instruction();
+                    display_instruction();
                 }
                 }
             }
 
         public void do_next_instruction() throws IOException
             {
+
                 if (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
                 } else {
                 }
                 }
+        
+        // nested class
+        public class code_display{
 
+
+            //ctor 
+            public code_display(){
+
+            }
+
+            public void display_code_in_human_readable_format(){
+                int programCounter = 0;
+                String instruction = machineStepper().next_instruction(true, programCounter);
+                int instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
+
+                DebugFrame.input_code_area.append(programCounter + " " + instruction + "\n");
+
+                // need to deal with LOAD null which is for variable declaration values
+                while (instruction != "STOP"){
+
+                programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
+                instruction_length_in_bytes);
+                instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
+                instruction = machineStepper().next_instruction(true, programCounter);
+                DebugFrame.input_code_area.append(programCounter + " " + instruction + "\n");
+
+                }
+            }
+        }
     }
 

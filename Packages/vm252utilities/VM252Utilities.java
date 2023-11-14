@@ -6,10 +6,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+
+import javax.sound.midi.SysexMessage;
 
 
 public class VM252Utilities
 {
+    public static HashMap<Integer, String> addressSymbolHashMap = new HashMap<Integer, String>();
 
     //
     // Public Class Methods
@@ -44,6 +49,7 @@ public class VM252Utilities
         public static byte [] readObjectCodeFromObjectFile(String objectFileName)
         {
 
+            addressSymbolHashMap.clear();
             byte [] objectCode = null;
 
             try {
@@ -209,6 +215,45 @@ public class VM252Utilities
                         int symbolicAddressInformationReadStatus
                             = objectFile.read(symbolicAddressInformation);
 
+                        boolean reading_memory_address = false;
+                        int current_line = 1;
+                        byte [] memory_address_bytes = new byte [4];
+                        String current_symbol = "";
+
+                        // Loop over all the bytes of the symbolic address information
+                        for (byte value : symbolicAddressInformation){
+
+                            if (reading_memory_address){
+                                    // keep modifying memory_address_bytes till we get the 4 bytes of the address
+                                    memory_address_bytes[current_line-1] = value;
+                                    // if we have the memory address for a symbol, then we add it to our hash map
+                                    if (current_line == 4){
+                                        // convert the 32 bit integer from binary to decimal and store that
+                                        int address= (memory_address_bytes[0]<<24)&0xff000000|
+                                                    (memory_address_bytes[1]<<16)&0x00ff0000|
+												      (memory_address_bytes[2]<< 8)&0x0000ff00|
+												      (memory_address_bytes[3]<< 0)&0x000000ff;
+
+                                        addressSymbolHashMap.put(address, current_symbol);
+                                        reading_memory_address = false;
+                                        // We will be reading the next symbol if any
+                                        current_symbol = "";
+                                    }
+                                    current_line +=1;
+                            }
+                            else if (value == (byte) 0) {
+                                // if we encounter 0 byte, it means we are going to get a 32 bit (4 bytes)
+                                // integer for the memory address of the symbolic code
+                                reading_memory_address = true;
+                            } 
+                            else {
+                                current_line = 1;
+                                byte [] value_list = {value};
+                                // decode the current byte to it's relevant ASCII and get the current symbol
+                                current_symbol += new String(value_list, "UTF-8");
+                            }
+                        }
+
                         if (symbolicAddressInformationReadStatus == -1)
                             throw new IOException();
 
@@ -238,6 +283,7 @@ public class VM252Utilities
 
                     }
 
+            System.out.println(addressSymbolHashMap);
             return objectCode;
 
             }
