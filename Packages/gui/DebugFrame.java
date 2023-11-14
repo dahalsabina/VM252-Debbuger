@@ -6,6 +6,7 @@
 package gui;
 import java.util.Scanner;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.Icon;
@@ -109,15 +110,26 @@ class StopAnnouncer extends VM252View
     @Override
     public void updateStoppedStatus()
     {        
-        // TO DO : UPDATE GUI AFTER PROGRAM HAS ENDED
-        // Disable all buttons except for restart
-        // If new file chosen, then renable buttons
+        // UPDATE GUI AFTER PROGRAM HAS ENDED
+        if (DebugFrame.button_clicked == DebugFrame.Pause){
+
+        String output_line_1 = String.format("machine paused with accumulator %d and program counter %d\n", myModel.accumulator(), myModel.programCounter());
+        DebugFrame.output_display.setText(output_line_1);
+            return;
+
+        } else if (DebugFrame.button_clicked == DebugFrame.Stop){
+            machine_stopped_midway();
+            return;
+
+        } else if (DebugFrame.simulatedMachine.stoppedStatus() == VM252Model.StoppedCategory.stopped){
         DebugFrame.reset_gui_components(false);
         String output_line_1 = String.format("machine stops with accumulator %d and program counter %d\n", myModel.accumulator(), myModel.programCounter());
         String output_line_2 = String.format("OUTPUT : %d", myModel.accumulator());
         DebugFrame.output_display.setText(output_line_1 + output_line_2
-            );        
-        }
+            );
+        } else if (DebugFrame.simulatedMachine.stoppedStatus() == VM252Model.StoppedCategory.notStopped){
+            DebugFrame.output_display.setText("");
+        }}
     
     public void machine_stopped_midway(){
         String output_line_1 = String.format("machine stops with accumulator %d and program counter %d\n", myModel.accumulator(), myModel.programCounter());
@@ -135,7 +147,8 @@ public class DebugFrame extends javax.swing.JFrame {
     static StopAnnouncer stopAnnouncerObject;
     static MemoryBytePrinter memoryBytePrinterObject;
     static String instruction_to_be_executed;
-    VM252Model simulatedMachine;
+    static JButton button_clicked;
+    public static VM252Model simulatedMachine;
     
     public static void reset_gui_components(boolean enable){
         Start.setEnabled(enable);
@@ -710,6 +723,8 @@ public class DebugFrame extends javax.swing.JFrame {
             String input_value = accumulator_display.getText();
             Scanner scanner_object = new Scanner(input_value);
             // TO DO what to pass here , not sure
+            button_clicked = next_Line;
+            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
             simulator.loadAndRun(objFileName, scanner_object, System.out, "next");
         }
     }
@@ -724,7 +739,8 @@ public class DebugFrame extends javax.swing.JFrame {
         if (file_Selected.getText().equals("No file selected")){
             JOptionPane.showMessageDialog(this, "Select a file first");
         } else {
-            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.stopped);
+            button_clicked = Pause;
+            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.paused);
         }
     }
 
@@ -738,6 +754,8 @@ public class DebugFrame extends javax.swing.JFrame {
             String input_value = accumulator_display.getText();
             Scanner scanner_object = new Scanner(input_value);
             // TO DO what to pass here , not sure
+            button_clicked = Start;
+            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
             simulator.loadAndRun(objFileName, scanner_object, System.out, "run");
 
         }}
@@ -812,8 +830,10 @@ public class DebugFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_executeAgainActionPerformed
 
     private void stopActionPerformed(ActionEvent evt){
+
+        button_clicked = Stop;
         reset_gui_components(false);
-        stopAnnouncerObject.machine_stopped_midway();
+        simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.stopped);
     }
 
 
@@ -874,10 +894,10 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JPanel Middle_Panel;
     private javax.swing.JPanel Middle_West;
     private javax.swing.JLabel Output_Value;
-    private static javax.swing.JButton Pause;
+    static javax.swing.JButton Pause;
     private javax.swing.JLabel Program_Counter;
     private static javax.swing.JButton Start;
-    private static javax.swing.JButton Stop;
+    static javax.swing.JButton Stop;
     private javax.swing.JPanel Top_Bottom_East;
     private javax.swing.JPanel Upper_Panel;
     private javax.swing.JLabel accumulator;
