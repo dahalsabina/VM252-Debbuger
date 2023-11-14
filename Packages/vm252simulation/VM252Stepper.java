@@ -139,7 +139,10 @@ public class VM252Stepper
         //     none
         //
 
-        public String next_instruction(){
+        public String next_instruction(
+            boolean specificProgramCounterValue,
+            int ProgramCounterValue
+        ){
 
             Instruction currentInstruction;
             Instruction nextInstruction;
@@ -147,7 +150,8 @@ public class VM252Stepper
             int instruction_length;
 
             try {
-                memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 2);
+                if (!specificProgramCounterValue) memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 2);
+                else memory_bytes_next_instruction = fetchMemoryBytes(ProgramCounterValue, 2);
                 currentInstruction
                     = new VM252ArchitectureSpecifications.Instruction(
                     memory_bytes_next_instruction
@@ -156,7 +160,8 @@ public class VM252Stepper
                 instruction_length = 2;
 
             } catch(IllegalArgumentException e) {
-                memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 1);
+                if (!specificProgramCounterValue) memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 1);
+                else memory_bytes_next_instruction = fetchMemoryBytes(ProgramCounterValue, 1);
                 currentInstruction
                     = new VM252ArchitectureSpecifications.Instruction(
                     memory_bytes_next_instruction
@@ -337,6 +342,29 @@ public class VM252Stepper
                             );
 
                     }
+
+            }
+
+            public int get_instruction_bytes_length(int programCounter){
+
+                    Instruction currentInstruction;
+                    try {
+
+                        currentInstruction
+                            = new VM252ArchitectureSpecifications.Instruction(
+                               fetchMemoryBytes(programCounter, 2)
+                               );
+
+                        }
+                    catch (IllegalArgumentException exception) {
+
+                        currentInstruction
+                            = new VM252ArchitectureSpecifications.Instruction(
+                               fetchMemoryBytes(programCounter, 1)
+                               );
+                        }
+
+                    return currentInstruction.instructionBytes().length;
 
             }
 
