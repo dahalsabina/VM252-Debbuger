@@ -4,6 +4,11 @@ package vm252simulation;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Scanner;
+
+import javax.swing.JOptionPane;
+
+import gui.DebugFrame;
+
 import java.lang.Math;
 
 
@@ -253,42 +258,30 @@ public class VM252Stepper
 
                        case VM252ArchitectureSpecifications.INPUT_OPCODE :
 
-                            for (machineOutputStream().print("INPUT: "),
-                                        machineOutputStream().flush();
-                                     machineInputStream().hasNext()
-                                        && ! machineInputStream().hasNextInt();
-                                    machineOutputStream().print("INPUT: "),
-                                        machineOutputStream().flush()
-                                    ) {
-                                machineInputStream().next();
-                                machineOutputStream().println(
-                                    "INPUT: Bad integer value; try again"
+                            boolean valid_input_received = false;
+                            Integer int_value = 0;
+                            while (!valid_input_received){
+                            try {
+                                int_value = Integer.parseInt(JOptionPane.showInputDialog(null,"INPUT :"));
+                                valid_input_received = true;
+                            } catch (NumberFormatException e) {
+                                // run the loop again till we get a valid input
+                            }
+                        }
+                            // show the input provided in the events of the gui
+                            machineState().setAccumulator(
+                                int_value
                                     );
-                                machineOutputStream().flush();
-                                }
-
-                            if (! machineInputStream().hasNext())
-
-                                throw
-                                    new IOException(
-                                        "No valid input available for INPUT intruction"
-                                        );
-
-                            else
-
-                                machineState().setAccumulator(
-                                    machineInputStream().nextInt()
-                                    );
-
-                            machineOutputStream().println();
-                            machineOutputStream().flush();
-
+                            DebugFrame.update_event_display();
                             break;
 
                         case VM252ArchitectureSpecifications.OUTPUT_OPCODE :
+                            DebugFrame.output_text.setText(DebugFrame.output_text.getText() + 
+                                "OUTPUT: " + machineState().accumulator() + "\n"
+                                );
                             machineOutputStream().println(
                                 "OUTPUT: " + machineState().accumulator()
-                                );
+                            );
                             machineOutputStream().println();
                             machineOutputStream().flush();
                             break;
