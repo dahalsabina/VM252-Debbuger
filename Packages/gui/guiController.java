@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
+import vm252simulation.VM252Model.StoppedCategory;
 import vm252utilities.VM252Utilities;
 
 
@@ -107,6 +108,16 @@ public class guiController
         //     none
         //
 
+        private void display_instruction(){
+
+            if (machineState().stoppedStatus() != VM252Model.StoppedCategory.stopped){
+            DebugFrame.instruction_to_be_executed = machineStepper().next_instruction();
+            DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+            } else {
+            DebugFrame.instruction_Display.setText("");
+            }
+        }
+
         public void loadAndRun(
             String objectFileName,
             Scanner machineInputStream,
@@ -145,14 +156,12 @@ public class guiController
                     while (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
-                        DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
-                        DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                        display_instruction();
                         }
                     }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
-                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
-                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                    display_instruction();
                 }
                 }}
             else {
@@ -160,14 +169,12 @@ public class guiController
                     while (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
-                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
-                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
+                    display_instruction();
                     }
                     }
                 else if (type_of_run.equals("next")){
-                    DebugFrame.instruction_to_be_executed = machineStepper().current_instruction();
-                    DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
                     do_next_instruction();
+                    display_instruction();
                 }
                 }
             }

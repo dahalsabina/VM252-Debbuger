@@ -116,6 +116,7 @@ class StopAnnouncer extends VM252View
 
         } else if (DebugFrame.simulatedMachine.stoppedStatus() == VM252Model.StoppedCategory.stopped){
         DebugFrame.reset_gui_components(false);
+        System.out.println("program ended");
         String output_line_1 = String.format("machine stops | ACC : %d | PC : %d\n", myModel.accumulator(), myModel.programCounter());
         DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ output_line_1 + "\n"
             );
@@ -442,7 +443,7 @@ public class DebugFrame extends javax.swing.JFrame {
         next_Instruction.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         next_Instruction.setText("Next Instruction");
 
-        instruction_Display.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        instruction_Display.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         instruction_Display.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         instruction_Display.setEditable(false);
         instruction_Display.setText("");

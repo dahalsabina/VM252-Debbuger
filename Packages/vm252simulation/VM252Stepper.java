@@ -3,6 +3,7 @@ package vm252simulation;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
@@ -14,6 +15,7 @@ import java.lang.Math;
 
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
 import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
+import vm252utilities.VM252Utilities;
 
 
 public class VM252Stepper
@@ -109,7 +111,6 @@ public class VM252Stepper
             myMachineState = machineState;
             myMachineInputStream = machineInputStream;
             myMachineOutputStream = machineOutputStream;
-
             }
 
     //
@@ -138,26 +139,55 @@ public class VM252Stepper
         //     none
         //
 
-        public String current_instruction(){
+        public String next_instruction(){
 
             Instruction currentInstruction;
+            Instruction nextInstruction;
+            byte [] memory_bytes_next_instruction;
+            int instruction_length;
+
             try {
-
+                memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 2);
                 currentInstruction
                     = new VM252ArchitectureSpecifications.Instruction(
-                        fetchMemoryBytes(machineState().programCounter(), 2)
+                    memory_bytes_next_instruction
                         );
+                nextInstruction = currentInstruction;
+                instruction_length = 2;
 
-                        }
-            catch (IllegalArgumentException exception) {
-
+            } catch(IllegalArgumentException e) {
+                memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 1);
                 currentInstruction
                     = new VM252ArchitectureSpecifications.Instruction(
-                        fetchMemoryBytes(machineState().programCounter(), 1)
+                    memory_bytes_next_instruction
                         );
-                        }
-            return currentInstruction.symbolicOpcode();
+                nextInstruction = currentInstruction;
+                instruction_length = 1;
+                if (nextInstruction.symbolicOpcode() == "STOP"){
+                    return nextInstruction.symbolicOpcode();
+                }
+            } 
+            System.out.println(currentInstruction.symbolicOpcode());
+
+                if (instruction_length == 2) {
+                    String symbolic_address = VM252Utilities.addressSymbolHashMap.get((int) memory_bytes_next_instruction[1]);
+                    if (symbolic_address == null){
+		               // int value= fetchMemoryData(1);
+		               // return currentInstruction.symbolicOpcode() + " " + value;
+		               // need to get what the value is just like SET something: Able to get the memory adress 
+		               // but need to get what is actually stored there
+                    }
+                    return nextInstruction.symbolicOpcode() + " " + symbolic_address;
+
+                } else{
+
+                    return nextInstruction.symbolicOpcode(); 
+
         }
+    }
+                        
+        
+
 
         public void step() throws IOException
         {
