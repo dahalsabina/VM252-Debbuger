@@ -11,7 +11,8 @@ public class VM252Model extends SimpleObservable implements ObservableVM252
 
     public enum StoppedCategory {
         notStopped,
-        stopped
+        stopped,
+        paused
         };
 
     private int myAccumulator;
