@@ -177,7 +177,6 @@ public class guiController
                 if (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
-                        System.out.println("YESS simulation has started man");
                 } else {
                 }
                 }

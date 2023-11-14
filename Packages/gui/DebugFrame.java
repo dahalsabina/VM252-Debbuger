@@ -33,7 +33,6 @@ class accumulatorPrinter extends VM252View {
     @Override
     public void updateAccumulator()
     {       
-        System.out.println("accumulators is now " + myModel.accumulator()); 
         // Update the gui value
         DebugFrame.accumulator_display.setText(""+myModel.accumulator());
         }
@@ -58,7 +57,6 @@ class ProgramCounterPrinter extends VM252View
     @Override
     public void updateProgramCounter()
     {        
-        System.out.println("program counter is now " + myModel.programCounter());  
         DebugFrame.count_diplay.setText(""+myModel.programCounter());
         } 
     
@@ -746,7 +744,6 @@ public class DebugFrame extends javax.swing.JFrame {
         if (file_Selected.getText().equals("No file selected")){
             JOptionPane.showMessageDialog(this, "Select a file first");
         } else {
-            System.out.println("Running file named"+ objFileName);
             String input_value = accumulator_display.getText();
             Scanner scanner_object = new Scanner(input_value);
             // TO DO what to pass here , not sure
@@ -768,6 +765,7 @@ public class DebugFrame extends javax.swing.JFrame {
     private void AccumulatorChangeActionPerfomed(java.awt.event.ActionEvent evt){
         String new_value = accumulator_display.getText();
         accumulatorPrinterObject.setAccumulator(Integer.parseInt(new_value));
+        DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ "ACC set to " + Integer.parseInt(new_value)+ "\n");
     }
     
     private void create_simulation_machine(){
@@ -837,6 +835,7 @@ public class DebugFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         String new_value = count_diplay.getText();
         programCounterPrinterObject.setProgramCounter(Integer.parseInt(new_value));
+        DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ "PC set to " + Integer.parseInt(new_value)+ "\n");
     
     }//GEN-LAST:event_count_diplayActionPerformed
 

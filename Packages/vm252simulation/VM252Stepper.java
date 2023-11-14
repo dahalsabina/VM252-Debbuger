@@ -162,7 +162,7 @@ public class VM252Stepper
         public void step() throws IOException
         {
 
-            if (machineState().stoppedStatus() != VM252Model.StoppedCategory.stopped) {
+            if (machineState().stoppedStatus() != VM252Model.StoppedCategory.stopped && machineState().stoppedStatus() != VM252Model.StoppedCategory.paused) {
 
                 Instruction currentInstruction;
                 int data;
