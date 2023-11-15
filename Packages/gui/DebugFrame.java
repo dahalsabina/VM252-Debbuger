@@ -1,16 +1,15 @@
-/*
- * 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package gui;
 import java.util.Scanner;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
+import gui.guiController.code_display;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +34,6 @@ class accumulatorPrinter extends VM252View {
     @Override
     public void updateAccumulator()
     {       
-        System.out.println("accumulators is now " + myModel.accumulator()); 
         // Update the gui value
         DebugFrame.accumulator_display.setText(""+myModel.accumulator());
         }
@@ -60,7 +58,6 @@ class ProgramCounterPrinter extends VM252View
     @Override
     public void updateProgramCounter()
     {        
-        System.out.println("program counter is now " + myModel.programCounter());  
         DebugFrame.count_diplay.setText(""+myModel.programCounter());
         } 
     
@@ -88,7 +85,7 @@ class MemoryBytePrinter extends VM252View
     {        
         System.out.printf("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));        
         String formattedString = String.format("memory byte at address %d is now %02x\n", address, myModel.memoryByte(address));
-        DebugFrame.input_code_area.append(formattedString);       
+        DebugFrame.memory_display_one.append(formattedString);       
 
         }
 
@@ -107,19 +104,30 @@ class StopAnnouncer extends VM252View
     @Override
     public void updateStoppedStatus()
     {        
-        // TO DO : UPDATE GUI AFTER PROGRAM HAS ENDED
-        // Disable all buttons except for restart
-        // If new file chosen, then renable buttons
+        // UPDATE GUI AFTER PROGRAM HAS ENDED
+        if (DebugFrame.button_clicked == DebugFrame.Pause){
+
+        String output_line_1 = String.format("machine paused | ACC : %d | PC %d\n", myModel.accumulator(), myModel.programCounter());
+        DebugFrame.event_display.setText(DebugFrame.event_display.getText()+output_line_1);
+            return;
+
+        } else if (DebugFrame.button_clicked == DebugFrame.Stop){
+            machine_stopped_midway();
+            return;
+
+        } else if (DebugFrame.simulatedMachine.stoppedStatus() == VM252Model.StoppedCategory.stopped){
         DebugFrame.reset_gui_components(false);
-        String output_line_1 = String.format("machine stops with accumulator %d and program counter %d\n", myModel.accumulator(), myModel.programCounter());
-        String output_line_2 = String.format("OUTPUT : %d", myModel.accumulator());
-        DebugFrame.output_display.setText(output_line_1 + output_line_2
-            );        
-        }
+        System.out.println("program ended");
+        String output_line_1 = String.format("machine stops | ACC : %d | PC : %d\n", myModel.accumulator(), myModel.programCounter());
+        DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ output_line_1 + "\n"
+            );
+        } else if (DebugFrame.simulatedMachine.stoppedStatus() == VM252Model.StoppedCategory.notStopped){
+        }}
     
     public void machine_stopped_midway(){
-        String output_line_1 = String.format("machine stops with accumulator %d and program counter %d\n", myModel.accumulator(), myModel.programCounter());
-        DebugFrame.output_display.setText(output_line_1);
+        String output_line_1 = String.format("machine stops | ACC : %d | PC : %d\n", myModel.accumulator(), myModel.programCounter());
+        DebugFrame.event_display.setText(DebugFrame.event_display.getText() + output_line_1);
+
     }
     }
 
@@ -133,7 +141,8 @@ public class DebugFrame extends javax.swing.JFrame {
     static StopAnnouncer stopAnnouncerObject;
     static MemoryBytePrinter memoryBytePrinterObject;
     static String instruction_to_be_executed;
-    VM252Model simulatedMachine;
+    static JButton button_clicked;
+    public static VM252Model simulatedMachine;
     
     public static void reset_gui_components(boolean enable){
         Start.setEnabled(enable);
@@ -141,7 +150,10 @@ public class DebugFrame extends javax.swing.JFrame {
         Stop.setEnabled(enable);
         Pause.setEnabled(enable);
 
-        DebugFrame.output_display.setText("");
+        if (enable) {
+            DebugFrame.output_text.setText("");
+            DebugFrame.event_display.setText("");}
+
         accumulator_display.setEditable(enable);
         count_diplay.setEditable(enable);
     }
@@ -166,7 +178,8 @@ public class DebugFrame extends javax.swing.JFrame {
         Upper_Panel = new javax.swing.JPanel();
         selectFile = new javax.swing.JButton();
         file_Selected = new javax.swing.JTextField();
-        Help = new javax.swing.JButton();
+        Icon helpIcon = new ImageIcon("C: ./icons/Help_Icon.png");
+        Help = new javax.swing.JButton(helpIcon);
         Button_Panel = new javax.swing.JPanel();
         Start = new javax.swing.JButton();
         Pause = new javax.swing.JButton();
@@ -191,11 +204,11 @@ public class DebugFrame extends javax.swing.JFrame {
         Bottom_East = new javax.swing.JPanel();
         Top_Bottom_East = new javax.swing.JPanel();
         input_scroll = new javax.swing.JScrollPane();
-        enter_input = new javax.swing.JTextArea();
+        output_text = new javax.swing.JTextArea();
         output_scroll = new javax.swing.JScrollPane();
-        output_display = new javax.swing.JTextArea();
-        Input_Value = new javax.swing.JLabel();
+        event_display = new javax.swing.JTextArea();
         Output_Value = new javax.swing.JLabel();
+        event_value = new javax.swing.JLabel();
         Center_Bottom_East = new javax.swing.JPanel();
         memory_options_one = new javax.swing.JComboBox<>();
         memory_display_scroll_one = new javax.swing.JScrollPane();
@@ -278,6 +291,7 @@ public class DebugFrame extends javax.swing.JFrame {
                 stopActionPerformed(evt);
             }
         });
+<<<<<<< HEAD
         Save.setText("Save");
         Save.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -285,6 +299,9 @@ public class DebugFrame extends javax.swing.JFrame {
             }
         });
 
+=======
+       
+>>>>>>> 1dccd2c9337dd9a45b9a006c0d936e408104c0e9
         adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Speed", "Speed x1.5", "Speed x2" }));
 
         javax.swing.GroupLayout Button_PanelLayout = new javax.swing.GroupLayout(Button_Panel);
@@ -305,7 +322,6 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(adjust_Speed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(Save)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         Button_PanelLayout.setVerticalGroup(
@@ -441,7 +457,7 @@ public class DebugFrame extends javax.swing.JFrame {
         next_Instruction.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         next_Instruction.setText("Next Instruction");
 
-        instruction_Display.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        instruction_Display.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         instruction_Display.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         instruction_Display.setEditable(false);
         instruction_Display.setText("");
@@ -489,6 +505,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         input_code_area.setColumns(20);
         input_code_area.setRows(5);
+        input_code_area.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
         input_code_scroll.setViewportView(input_code_area);
         input_code_area.getAccessibleContext().setAccessibleParent(Bottom_West);
 
@@ -519,27 +536,27 @@ public class DebugFrame extends javax.swing.JFrame {
 
         input_scroll.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
-        enter_input.setColumns(20);
-        enter_input.setRows(5);
-        input_scroll.setViewportView(enter_input);
-        enter_input.getAccessibleContext().setAccessibleParent(Bottom_West);
+        output_text.setColumns(20);
+        output_text.setRows(5);
+        input_scroll.setViewportView(output_text);
+        output_text.getAccessibleContext().setAccessibleParent(Bottom_West);
 
         output_scroll.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-        output_display.setColumns(20);
-        output_display.setEditable(false);
-        output_display.setRows(5);
-        output_scroll.setViewportView(output_display);
+        event_display.setColumns(20);
+        event_display.setEditable(false);
+        event_display.setRows(5);
+        output_scroll.setViewportView(event_display);
 
-        Input_Value.setBackground(new java.awt.Color(153, 153, 153));
-        Input_Value.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        Input_Value.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Input_Value.setText("Input");
-        Input_Value.setOpaque(true);
-
+        Output_Value.setBackground(new java.awt.Color(153, 153, 153));
         Output_Value.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         Output_Value.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Output_Value.setText("Output");
+        Output_Value.setOpaque(true);
+
+        event_value.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        event_value.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        event_value.setText("Events");
 
         javax.swing.GroupLayout Top_Bottom_EastLayout = new javax.swing.GroupLayout(Top_Bottom_East);
         Top_Bottom_East.setLayout(Top_Bottom_EastLayout);
@@ -549,21 +566,21 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(Top_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(input_scroll)
-                    .addComponent(Input_Value, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(Output_Value, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, 0)
                 .addGroup(Top_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(output_scroll)
-                    .addComponent(Output_Value, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(event_value, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, 0))
         );
         Top_Bottom_EastLayout.setVerticalGroup(
             Top_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(Top_Bottom_EastLayout.createSequentialGroup()
                 .addGroup(Top_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Input_Value)
+                    .addComponent(Output_Value)
                     .addGroup(Top_Bottom_EastLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(Output_Value)))
+                        .addComponent(event_value)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(Top_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(input_scroll, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -707,15 +724,15 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void NextActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
         try {
-            System.out.println(file_Selected.getText());
             if (file_Selected.getText().equals("No file selected")){
             JOptionPane.showMessageDialog(this, "Select a file first");
             } else {
-            System.out.println("Next instruction for file named"+ objFileName);
             // TO DO what to pass here , not sure
             String input_value = accumulator_display.getText();
             Scanner scanner_object = new Scanner(input_value);
             // TO DO what to pass here , not sure
+            button_clicked = next_Line;
+            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
             simulator.loadAndRun(objFileName, scanner_object, System.out, "next");
         }
     }
@@ -726,24 +743,24 @@ public class DebugFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_StartActionPerformed
 
     private void PauseActionPerformed(ActionEvent evt){
-            System.out.println(file_Selected.getText());
         if (file_Selected.getText().equals("No file selected")){
             JOptionPane.showMessageDialog(this, "Select a file first");
         } else {
-            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.stopped);
+            button_clicked = Pause;
+            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.paused);
         }
     }
 
     private void StartActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
         try {
-            System.out.println(file_Selected.getText());
         if (file_Selected.getText().equals("No file selected")){
             JOptionPane.showMessageDialog(this, "Select a file first");
         } else {
-            System.out.println("Running file named"+ objFileName);
             String input_value = accumulator_display.getText();
             Scanner scanner_object = new Scanner(input_value);
             // TO DO what to pass here , not sure
+            button_clicked = Start;
+            simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
             simulator.loadAndRun(objFileName, scanner_object, System.out, "run");
 
         }}
@@ -760,6 +777,7 @@ public class DebugFrame extends javax.swing.JFrame {
     private void AccumulatorChangeActionPerfomed(java.awt.event.ActionEvent evt){
         String new_value = accumulator_display.getText();
         accumulatorPrinterObject.setAccumulator(Integer.parseInt(new_value));
+        DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ "ACC set to " + Integer.parseInt(new_value)+ "\n");
     }
     
     private void create_simulation_machine(){
@@ -787,7 +805,6 @@ public class DebugFrame extends javax.swing.JFrame {
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());
             if (selectedFileName.endsWith(".vm252obj")) 
             {
-             // System.out.println("valid file");
             file_Selected.setText(selectedFile.getName());
             objFileName = selectedFile.getAbsolutePath();
             accumulator_display.setText("0");
@@ -810,7 +827,7 @@ public class DebugFrame extends javax.swing.JFrame {
          count_diplay.setText("0");
          accumulator_display.setText("0");
          instruction_Display.setText("");
-         DebugFrame.input_code_area.setText(" ");
+         DebugFrame.memory_display_one.setText(" ");
          create_simulation_machine();
          reset_gui_components(true);
        
@@ -818,20 +835,18 @@ public class DebugFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_executeAgainActionPerformed
 
     private void stopActionPerformed(ActionEvent evt){
+
+        button_clicked = Stop;
         reset_gui_components(false);
-        stopAnnouncerObject.machine_stopped_midway();
+        simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.stopped);
     }
 
-    private void SaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SaveActionPerformed
-       
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_SaveActionPerformed
 
     private void count_diplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_count_diplayActionPerformed
         // TODO add your handling code here:
         String new_value = count_diplay.getText();
         programCounterPrinterObject.setProgramCounter(Integer.parseInt(new_value));
+        DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ "PC set to " + Integer.parseInt(new_value)+ "\n");
     
     }//GEN-LAST:event_count_diplayActionPerformed
 
@@ -878,25 +893,24 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JPanel Button_Panel;
     private javax.swing.JPanel Center_Bottom_East;
     private javax.swing.JButton Help;
-    private javax.swing.JLabel Input_Value;
+    private javax.swing.JLabel Output_Value;
     private javax.swing.JPanel Last_Bottom_East;
     private javax.swing.JPanel Middle_Center;
     private javax.swing.JPanel Middle_East;
     private javax.swing.JPanel Middle_Panel;
     private javax.swing.JPanel Middle_West;
-    private javax.swing.JLabel Output_Value;
-    private static javax.swing.JButton Pause;
+    private javax.swing.JLabel event_value;
+    static javax.swing.JButton Pause;
     private javax.swing.JLabel Program_Counter;
-    private javax.swing.JButton Save;
     private static javax.swing.JButton Start;
-    private static javax.swing.JButton Stop;
+    static javax.swing.JButton Stop;
     private javax.swing.JPanel Top_Bottom_East;
     private javax.swing.JPanel Upper_Panel;
     private javax.swing.JLabel accumulator;
     public static javax.swing.JTextField accumulator_display;
     private javax.swing.JComboBox<String> adjust_Speed;
     public static javax.swing.JTextField count_diplay;
-    private javax.swing.JTextArea enter_input;
+    public static javax.swing.JTextArea output_text;
     private javax.swing.JButton executeAgain;
     private javax.swing.JTextField file_Selected;
     public static  javax.swing.JTextArea input_code_area;
@@ -912,13 +926,19 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> memory_options_two;
     private javax.swing.JLabel next_Instruction;
     private static javax.swing.JButton next_Line;
-    public static javax.swing.JTextArea output_display;
+    public static javax.swing.JTextArea event_display;
     private javax.swing.JScrollPane output_scroll;
     private javax.swing.JButton selectFile;
     // End of variables declaration//GEN-END:variables
 
     private Scanner Scanner(String input_value) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public static void update_event_display(){
+        String output_line_1 = String.format("INPUT %d given | ACC : %d | PC : %d", simulatedMachine.accumulator(), simulatedMachine.accumulator(), simulatedMachine.programCounter());
+        DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ output_line_1 + "\n");
+
     }
 
 

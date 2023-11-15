@@ -3,12 +3,19 @@ package vm252simulation;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Scanner;
+
+import javax.swing.JOptionPane;
+
+import gui.DebugFrame;
+
 import java.lang.Math;
 
 
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
 import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
+import vm252utilities.VM252Utilities;
 
 
 public class VM252Stepper
@@ -104,7 +111,6 @@ public class VM252Stepper
             myMachineState = machineState;
             myMachineInputStream = machineInputStream;
             myMachineOutputStream = machineOutputStream;
-
             }
 
     //
@@ -133,31 +139,65 @@ public class VM252Stepper
         //     none
         //
 
-        public String current_instruction(){
+        public String next_instruction(
+            boolean specificProgramCounterValue,
+            int ProgramCounterValue
+        ){
 
             Instruction currentInstruction;
+            Instruction nextInstruction;
+            byte [] memory_bytes_next_instruction;
+            int instruction_length;
+
             try {
-
+                if (!specificProgramCounterValue) memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 2);
+                else memory_bytes_next_instruction = fetchMemoryBytes(ProgramCounterValue, 2);
                 currentInstruction
                     = new VM252ArchitectureSpecifications.Instruction(
-                        fetchMemoryBytes(machineState().programCounter(), 2)
+                    memory_bytes_next_instruction
                         );
+                nextInstruction = currentInstruction;
+                instruction_length = 2;
 
-                        }
-            catch (IllegalArgumentException exception) {
-
+            } catch(IllegalArgumentException e) {
+                if (!specificProgramCounterValue) memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 1);
+                else memory_bytes_next_instruction = fetchMemoryBytes(ProgramCounterValue, 1);
                 currentInstruction
                     = new VM252ArchitectureSpecifications.Instruction(
-                        fetchMemoryBytes(machineState().programCounter(), 1)
+                    memory_bytes_next_instruction
                         );
-                        }
-            return currentInstruction.symbolicOpcode();
+                nextInstruction = currentInstruction;
+                instruction_length = 1;
+                if (nextInstruction.symbolicOpcode() == "STOP"){
+                    return nextInstruction.symbolicOpcode();
+                }
+            } 
+            System.out.println(currentInstruction.symbolicOpcode());
+
+                if (instruction_length == 2) {
+                    String symbolic_address = VM252Utilities.addressSymbolHashMap.get((int) memory_bytes_next_instruction[1]);
+                    if (symbolic_address == null){
+		               // int value= fetchMemoryData(1);
+		               // return currentInstruction.symbolicOpcode() + " " + value;
+		               // need to get what the value is just like SET something: Able to get the memory adress 
+		               // but need to get what is actually stored there
+                    }
+                    return nextInstruction.symbolicOpcode() + " " + symbolic_address;
+
+                } else{
+
+                    return nextInstruction.symbolicOpcode(); 
+
         }
+    }
+                        
+        
+
 
         public void step() throws IOException
         {
 
-            if (machineState().stoppedStatus() != VM252Model.StoppedCategory.stopped) {
+            if (machineState().stoppedStatus() != VM252Model.StoppedCategory.stopped && machineState().stoppedStatus() != VM252Model.StoppedCategory.paused) {
 
                 Instruction currentInstruction;
                 int data;
@@ -253,42 +293,30 @@ public class VM252Stepper
 
                        case VM252ArchitectureSpecifications.INPUT_OPCODE :
 
-                            for (machineOutputStream().print("INPUT: "),
-                                        machineOutputStream().flush();
-                                     machineInputStream().hasNext()
-                                        && ! machineInputStream().hasNextInt();
-                                    machineOutputStream().print("INPUT: "),
-                                        machineOutputStream().flush()
-                                    ) {
-                                machineInputStream().next();
-                                machineOutputStream().println(
-                                    "INPUT: Bad integer value; try again"
+                            boolean valid_input_received = false;
+                            Integer int_value = 0;
+                            while (!valid_input_received){
+                            try {
+                                int_value = Integer.parseInt(JOptionPane.showInputDialog(null,"INPUT :"));
+                                valid_input_received = true;
+                            } catch (NumberFormatException e) {
+                                // run the loop again till we get a valid input
+                            }
+                        }
+                            // show the input provided in the events of the gui
+                            machineState().setAccumulator(
+                                int_value
                                     );
-                                machineOutputStream().flush();
-                                }
-
-                            if (! machineInputStream().hasNext())
-
-                                throw
-                                    new IOException(
-                                        "No valid input available for INPUT intruction"
-                                        );
-
-                            else
-
-                                machineState().setAccumulator(
-                                    machineInputStream().nextInt()
-                                    );
-
-                            machineOutputStream().println();
-                            machineOutputStream().flush();
-
+                            DebugFrame.update_event_display();
                             break;
 
                         case VM252ArchitectureSpecifications.OUTPUT_OPCODE :
+                            DebugFrame.output_text.setText(DebugFrame.output_text.getText() + 
+                                "OUTPUT: " + machineState().accumulator() + "\n"
+                                );
                             machineOutputStream().println(
                                 "OUTPUT: " + machineState().accumulator()
-                                );
+                            );
                             machineOutputStream().println();
                             machineOutputStream().flush();
                             break;
@@ -314,6 +342,29 @@ public class VM252Stepper
                             );
 
                     }
+
+            }
+
+            public int get_instruction_bytes_length(int programCounter){
+
+                    Instruction currentInstruction;
+                    try {
+
+                        currentInstruction
+                            = new VM252ArchitectureSpecifications.Instruction(
+                               fetchMemoryBytes(programCounter, 2)
+                               );
+
+                        }
+                    catch (IllegalArgumentException exception) {
+
+                        currentInstruction
+                            = new VM252ArchitectureSpecifications.Instruction(
+                               fetchMemoryBytes(programCounter, 1)
+                               );
+                        }
+
+                    return currentInstruction.instructionBytes().length;
 
             }
 
