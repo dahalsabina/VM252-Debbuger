@@ -186,7 +186,6 @@ public class DebugFrame extends javax.swing.JFrame {
         next_Line = new javax.swing.JButton();
         executeAgain = new javax.swing.JButton();
         Stop = new javax.swing.JButton();
-        Save = new javax.swing.JButton();
         adjust_Speed = new javax.swing.JComboBox<>();
         Middle_Panel = new javax.swing.JPanel();
         Middle_West = new javax.swing.JPanel();
@@ -294,17 +293,6 @@ public class DebugFrame extends javax.swing.JFrame {
                 stopActionPerformed(evt);
             }
         });
-<<<<<<< HEAD
-        Save.setText("Save");
-        Save.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SaveActionPerformed(evt);
-            }
-        });
-
-=======
-       
->>>>>>> 1dccd2c9337dd9a45b9a006c0d936e408104c0e9
         adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Speed", "Speed x1.5", "Speed x2" }));
 
         javax.swing.GroupLayout Button_PanelLayout = new javax.swing.GroupLayout(Button_Panel);
@@ -337,7 +325,6 @@ public class DebugFrame extends javax.swing.JFrame {
                     .addComponent(next_Line)
                     .addComponent(executeAgain)
                     .addComponent(Stop)
-                    .addComponent(Save)
                     .addComponent(adjust_Speed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
