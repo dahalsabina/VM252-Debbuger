@@ -72,7 +72,7 @@ public class VM252Stepper
 
             }
 
-        private int fetchMemoryData(int memoryAddress)
+        public int fetchMemoryData(int memoryAddress)
         {
 
             byte [ ] dataBytes = fetchMemoryBytes(memoryAddress, 2);
@@ -176,7 +176,9 @@ public class VM252Stepper
 
                 if (instruction_length == 2) {
                     String symbolic_address = VM252Utilities.addressSymbolHashMap.get((int) memory_bytes_next_instruction[1]);
-                    if (symbolic_address == null){
+                    if (symbolic_address == null && nextInstruction.symbolicOpcode() == "SET"){
+
+                           symbolic_address = DebugFrame.simulatedMachine.memoryByte(memory_bytes_next_instruction[1]) + "";
 		               // int value= fetchMemoryData(1);
 		               // return currentInstruction.symbolicOpcode() + " " + value;
 		               // need to get what the value is just like SET something: Able to get the memory adress 

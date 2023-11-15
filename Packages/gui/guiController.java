@@ -6,13 +6,9 @@ import java.io.PrintStream;
 import java.util.Scanner;
 
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
-import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
-import vm252simulation.VM252Model.StoppedCategory;
 import vm252utilities.VM252Utilities;
-
-
 
 
 public class guiController
@@ -169,11 +165,13 @@ public class guiController
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
                         display_instruction();
+                        update_line_highlight();
                         }
                     }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
                     display_instruction();
+                    update_line_highlight();
                 }
 
                 }
@@ -183,10 +181,12 @@ public class guiController
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
                     display_instruction();
+                    update_line_highlight();
                     }
                     }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
+                    update_line_highlight();
                     display_instruction();
                 }
                 }
@@ -202,6 +202,10 @@ public class guiController
                 }
                 }
         
+        public void update_line_highlight(){
+
+            int current_program_counter = DebugFrame.simulatedMachine.programCounter();
+        }
         // nested class
         public class code_display{
 
@@ -227,7 +231,10 @@ public class guiController
                 instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
                 instruction = machineStepper().next_instruction(true, programCounter);
                 if (instruction.endsWith("LOAD null")){
-                    instruction = VM252Utilities.addressSymbolHashMap.get(programCounter);
+
+                    // need to get the instruction address
+                    int data = DebugFrame.simulatedMachine.memoryByte(programCounter+1);
+                    instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
                 }
                 DebugFrame.input_code_area.append(programCounter + " " + instruction + "\n");
 

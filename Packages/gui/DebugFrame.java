@@ -784,6 +784,9 @@ public class DebugFrame extends javax.swing.JFrame {
     simulator = new guiController(simulatedMachine);
     simulator.loadFile(objFileName, new Scanner(System.in), System.out);
 
+    // also put the first instruction
+    instruction_Display.setText(simulator.machineStepper().next_instruction(true, 0));
+
     }
 
     private void selectFileActionPerformed(java.awt.event.ActionEvent evt) throws IOException{//GEN-FIRST:event_selectFileActionPerformed
