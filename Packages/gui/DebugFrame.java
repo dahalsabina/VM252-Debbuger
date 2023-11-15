@@ -229,7 +229,10 @@ public class DebugFrame extends javax.swing.JFrame {
         selectFile.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         selectFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selectFileActionPerformed(evt);
+                try {
+                selectFileActionPerformed(evt);}
+                catch (IOException exception){
+                }
             }
         });
 
@@ -733,7 +736,7 @@ public class DebugFrame extends javax.swing.JFrame {
             // TO DO what to pass here , not sure
             button_clicked = next_Line;
             simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
-            simulator.loadAndRun(objFileName, scanner_object, System.out, "next");
+            simulator.run_simulation(input_value, scanner_object, System.out, "next");
         }
     }
         catch (IOException e){
@@ -758,10 +761,9 @@ public class DebugFrame extends javax.swing.JFrame {
         } else {
             String input_value = accumulator_display.getText();
             Scanner scanner_object = new Scanner(input_value);
-            // TO DO what to pass here , not sure
             button_clicked = Start;
             simulatedMachine.setStoppedStatus(VM252Model.StoppedCategory.notStopped);
-            simulator.loadAndRun(objFileName, scanner_object, System.out, "run");
+            simulator.run_simulation(input_value, scanner_object, System.out, "run");
 
         }}
         catch (IOException e){
@@ -780,7 +782,7 @@ public class DebugFrame extends javax.swing.JFrame {
         DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ "ACC set to " + Integer.parseInt(new_value)+ "\n");
     }
     
-    private void create_simulation_machine(){
+    private void create_simulation_machine() throws IOException{
 
     simulatedMachine = new VM252Model();
     accumulatorPrinterObject = new accumulatorPrinter(simulatedMachine);
@@ -791,15 +793,20 @@ public class DebugFrame extends javax.swing.JFrame {
     simulatedMachine.attach(programCounterPrinterObject);
     simulatedMachine.attach(memoryBytePrinterObject);
     simulatedMachine.attach(stopAnnouncerObject);
-
     simulator = new guiController(simulatedMachine);
+    simulator.loadFile(objFileName, new Scanner(System.in), System.out);
+
+    // also put the first instruction
+    instruction_Display.setText(simulator.machineStepper().next_instruction(true, 0));
+
     }
 
-    private void selectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFileActionPerformed
+    private void selectFileActionPerformed(java.awt.event.ActionEvent evt) throws IOException{//GEN-FIRST:event_selectFileActionPerformed
 
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         int result = fileChooser.showOpenDialog(fileChooser);
         if (result == JFileChooser.APPROVE_OPTION) {
+
             File selectedFile = fileChooser.getSelectedFile();
             String selectedFileName = selectedFile.getName();
             System.out.println("Selected file: " + selectedFile.getAbsolutePath());
@@ -828,7 +835,12 @@ public class DebugFrame extends javax.swing.JFrame {
          accumulator_display.setText("0");
          instruction_Display.setText("");
          DebugFrame.memory_display_one.setText(" ");
-         create_simulation_machine();
+         try {
+            create_simulation_machine();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
          reset_gui_components(true);
        
         

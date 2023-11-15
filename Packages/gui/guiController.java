@@ -6,13 +6,9 @@ import java.io.PrintStream;
 import java.util.Scanner;
 
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
-import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
-import vm252simulation.VM252Model.StoppedCategory;
 import vm252utilities.VM252Utilities;
-
-
 
 
 public class guiController
@@ -122,18 +118,11 @@ public class guiController
             }
         }
 
-        public void loadAndRun(
+        public void loadFile(
             String objectFileName,
             Scanner machineInputStream,
-            PrintStream machineOutputStream,
-            String type_of_run
-            ) throws IOException
-        {
-            if (this.simulation_started == false){
-    
-            this.simulation_started = true;
-            this.simulation_paused = false;
-
+            PrintStream machineOutputStream
+        ) throws IOException{
             byte [ ] objectCode
                 = VM252Utilities.readObjectCodeFromObjectFile(objectFileName);
 
@@ -148,10 +137,25 @@ public class guiController
                 // of machineState()
                 //
 
-                    for (int address = 0; address < objectCode.length; ++ address)
+                for (int address = 0; address < objectCode.length; ++ address)
                         machineState().setMemoryByte(address, objectCode[ address ]);
+           
+                code_display_object = this.new code_display();
+                code_display_object.display_code_in_human_readable_format();}
 
-                //
+        }
+
+        public void run_simulation(
+            String objectFileName,
+            Scanner machineInputStream,
+            PrintStream machineOutputStream,
+            String type_of_run
+            ) throws IOException
+        {
+            if (this.simulation_started == false){
+    
+            this.simulation_started = true;
+            this.simulation_paused = false;
                 // Simulate execution of the object code until the simulated machine
                 // executes a STOP instruction
                 //
@@ -161,26 +165,28 @@ public class guiController
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
                         display_instruction();
+                        update_line_highlight();
                         }
                     }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
                     display_instruction();
+                    update_line_highlight();
                 }
 
-                code_display_object = this.new code_display();
-                code_display_object.display_code_in_human_readable_format();
-                }}
+                }
             else {
                 if (type_of_run.equals("run")) {
                     while (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
                     display_instruction();
+                    update_line_highlight();
                     }
                     }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
+                    update_line_highlight();
                     display_instruction();
                 }
                 }
@@ -196,6 +202,10 @@ public class guiController
                 }
                 }
         
+        public void update_line_highlight(){
+
+            int current_program_counter = DebugFrame.simulatedMachine.programCounter();
+        }
         // nested class
         public class code_display{
 
@@ -206,6 +216,7 @@ public class guiController
             }
 
             public void display_code_in_human_readable_format(){
+                DebugFrame.input_code_area.setText("");
                 int programCounter = 0;
                 String instruction = machineStepper().next_instruction(true, programCounter);
                 int instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
@@ -219,6 +230,12 @@ public class guiController
                 instruction_length_in_bytes);
                 instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
                 instruction = machineStepper().next_instruction(true, programCounter);
+                if (instruction.endsWith("LOAD null")){
+
+                    // need to get the instruction address
+                    int data = DebugFrame.simulatedMachine.memoryByte(programCounter+1);
+                    instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
+                }
                 DebugFrame.input_code_area.append(programCounter + " " + instruction + "\n");
 
                 }
