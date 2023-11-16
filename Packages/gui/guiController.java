@@ -1,6 +1,8 @@
 package gui;
 
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -30,6 +32,8 @@ public class guiController
         private boolean simulation_started;
         private boolean simulation_paused;
         public code_display code_display_object;
+        private javax.swing.Timer timer;
+        private double myRunSpeed;
     //
     // Public Accessors
     //
@@ -55,12 +59,18 @@ public class guiController
     // Private Mutators
     //
 
+
         private void setMachineState(VM252Model machineState)
         {
 
             myMachineState = machineState;
 
             }
+
+
+        public void setRunSpeed(double speed){
+            myRunSpeed = speed;
+        }
 
         private void setMachineStepper(VM252Stepper machineStepper)
         {
@@ -79,6 +89,8 @@ public class guiController
             this.simulation_paused = false;
             setMachineState(simulatedMachine);
             myLineHighlightPrinterObject = lineHighlightPrinterObject;
+            create_timer();
+            myRunSpeed = 1;
 
             }
 
@@ -156,6 +168,29 @@ public class guiController
 
         }
 
+        public void stop_timer(){
+            timer.stop();
+        }
+
+        public void create_timer(){
+            timer = new javax.swing.Timer((int) ((2-myRunSpeed) * 1000), new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+
+                                    if (machineState().stoppedStatus()
+                            == VM252Model.StoppedCategory.notStopped){
+                                    try {
+                                    machineStepper().step();
+                                    }   catch (IOException e1) {
+                                        System.out.println(e1);
+                                }
+                                    display_instruction();
+                                    lineHighlighPrinterObject().updateHighlighter();
+                                }
+                            else stop_timer();;}
+                    });
+
+        }
+
         public void run_simulation(
             String objectFileName,
             Scanner machineInputStream,
@@ -163,6 +198,9 @@ public class guiController
             String type_of_run
             ) throws IOException
         {
+            stop_timer();
+            create_timer();
+
             if (this.simulation_started == false){
     
             this.simulation_started = true;
@@ -172,13 +210,9 @@ public class guiController
                 //
 
                 if (type_of_run.equals("run")) {
-                    while (machineState().stoppedStatus()
-                            == VM252Model.StoppedCategory.notStopped)
-                        {machineStepper().step();
-                        display_instruction();
-                        lineHighlighPrinterObject().updateHighlighter();
-                        }
+                        timer.start();
                     }
+
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
                     display_instruction();
@@ -188,20 +222,14 @@ public class guiController
                 }
             else {
                 if (type_of_run.equals("run")) {
-                    while (machineState().stoppedStatus()
-                            == VM252Model.StoppedCategory.notStopped)
-                        {machineStepper().step();
-                    display_instruction();
-                    lineHighlighPrinterObject().updateHighlighter();
-                    }
-                    }
+                    timer.start();
+                   }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
                     display_instruction();
                     lineHighlighPrinterObject().updateHighlighter();
                 }
-                }
-            }
+                }}
 
         public void do_next_instruction() throws IOException
             {

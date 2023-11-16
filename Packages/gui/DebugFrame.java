@@ -1,5 +1,7 @@
 package gui;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -345,6 +347,18 @@ public class DebugFrame extends javax.swing.JFrame {
             }
         });
        
+        adjust_Speed.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                if (simulator != null) {
+                String line = (String) adjust_Speed.getSelectedItem();
+                Pattern pattern = Pattern.compile("x([102].[0-9]{1,2}).*");
+                Matcher matcher = pattern.matcher(line);
+                matcher.find();
+                simulator.setRunSpeed(Double.parseDouble(matcher.group(1)));
+
+                }
+            }
+        });
         
         
         
@@ -355,7 +369,7 @@ public class DebugFrame extends javax.swing.JFrame {
                 stopActionPerformed(evt);
             }
         });
-        adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Speed", "Speed x1.5", "Speed x2" }));
+        adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Speed x1.0", "Speed x0.75", "Speed x0.5", "Speed x0.25"}));
 
         javax.swing.GroupLayout Button_PanelLayout = new javax.swing.GroupLayout(Button_Panel);
         Button_Panel.setLayout(Button_PanelLayout);
@@ -844,6 +858,9 @@ public class DebugFrame extends javax.swing.JFrame {
     simulatedMachine.attach(programCounterPrinterObject);
     simulatedMachine.attach(memoryBytePrinterObject);
     simulatedMachine.attach(stopAnnouncerObject);
+
+    if (simulator != null) simulator.stop_timer();
+
     simulator = new guiController(simulatedMachine, lineHighlightPrinterObject);
     simulator.loadFile(objFileName, new Scanner(System.in), System.out);
     lineHighlightPrinterObject.updateHighlighter();
