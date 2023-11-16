@@ -4,15 +4,19 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
-import gui.guiController.code_display;
 
 import java.io.File;
 import java.io.IOException;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -21,6 +25,62 @@ import java.awt.event.ActionListener;
  * 
  * @author : Abigail Wood, Sabina Dahal, and Supreme Paudel
  */
+
+class lineHighlightPrinter{
+
+    private final VM252Model myModel;
+    private final JTextArea myTextArea;
+    private int currentLine;
+    private Object currentHighlighter;
+
+    public int getCurrentLine(int pc_value){
+        int line_number = 0;
+        String [] list_of_lines =myTextArea.getText().split("\n");
+        for (String line: list_of_lines){
+            if (line.startsWith(""+pc_value)){
+                break;
+            }
+            line_number++;
+        }
+        currentLine = line_number;
+        return currentLine;
+    }
+
+    public void updateHighlighter(){
+
+        try {
+        int pc = myModel.programCounter();
+        currentLine = getCurrentLine(pc);
+        Highlighter high = myTextArea.getHighlighter();
+
+        try {
+        high.removeHighlight(currentHighlighter);}
+        catch (NullPointerException e){
+            System.out.println(e);
+        }
+
+        int start = myTextArea.getLineStartOffset(currentLine);
+        int end   = myTextArea.getLineEndOffset(currentLine);
+        currentHighlighter = high.addHighlight(start,end,new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+        }
+
+        catch (BadLocationException e) {
+            }
+        }
+    
+    public lineHighlightPrinter(VM252Model model, JTextArea textArea)
+    {       
+        myModel = model;       
+        myTextArea = textArea;
+        currentLine = 1;
+        }
+   
+    public void setCurrentLine(int value){
+        currentLine = value;
+    
+    }
+
+        }
 
 class accumulatorPrinter extends VM252View {
          
@@ -137,6 +197,7 @@ public class DebugFrame extends javax.swing.JFrame {
     String objFileName = "";
     static guiController simulator;
     static accumulatorPrinter accumulatorPrinterObject;
+    static lineHighlightPrinter lineHighlightPrinterObject;
     static ProgramCounterPrinter programCounterPrinterObject;
     static StopAnnouncer stopAnnouncerObject;
     static MemoryBytePrinter memoryBytePrinterObject;
@@ -776,12 +837,15 @@ public class DebugFrame extends javax.swing.JFrame {
     programCounterPrinterObject = new ProgramCounterPrinter(simulatedMachine);
     stopAnnouncerObject = new StopAnnouncer(simulatedMachine);
     memoryBytePrinterObject = new MemoryBytePrinter(simulatedMachine);
+    lineHighlightPrinterObject = new lineHighlightPrinter(simulatedMachine, DebugFrame.input_code_area);
+
     simulatedMachine.attach(accumulatorPrinterObject);
     simulatedMachine.attach(programCounterPrinterObject);
     simulatedMachine.attach(memoryBytePrinterObject);
     simulatedMachine.attach(stopAnnouncerObject);
-    simulator = new guiController(simulatedMachine);
+    simulator = new guiController(simulatedMachine, lineHighlightPrinterObject);
     simulator.loadFile(objFileName, new Scanner(System.in), System.out);
+    lineHighlightPrinterObject.updateHighlighter();
 
     // also put the first instruction
     instruction_Display.setText(simulator.machineStepper().next_instruction(true, 0));
