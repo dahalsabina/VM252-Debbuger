@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Scanner;
 
+import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
@@ -20,6 +25,7 @@ public class guiController
 
         private VM252Model myMachineState;
         private VM252Stepper myMachineStepper;
+        private lineHighlightPrinter myLineHighlightPrinterObject;
         private boolean simulation_started;
         private boolean simulation_paused;
         public code_display code_display_object;
@@ -27,6 +33,9 @@ public class guiController
     // Public Accessors
     //
 
+        public lineHighlightPrinter lineHighlighPrinterObject(){
+            return myLineHighlightPrinterObject;
+        }
         public VM252Model machineState()
         {
 
@@ -63,11 +72,12 @@ public class guiController
     // Public Ctors
     //
 
-        public guiController(VM252Model simulatedMachine)
+        public guiController(VM252Model simulatedMachine, lineHighlightPrinter lineHighlightPrinterObject)
         {
             this.simulation_started = false;
             this.simulation_paused = false;
             setMachineState(simulatedMachine);
+            myLineHighlightPrinterObject = lineHighlightPrinterObject;
 
             }
 
@@ -165,13 +175,13 @@ public class guiController
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
                         display_instruction();
-                        update_line_highlight();
+                        lineHighlighPrinterObject().updateHighlighter();
                         }
                     }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
                     display_instruction();
-                    update_line_highlight();
+                    lineHighlighPrinterObject().updateHighlighter();
                 }
 
                 }
@@ -181,13 +191,13 @@ public class guiController
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
                     display_instruction();
-                    update_line_highlight();
+                    lineHighlighPrinterObject().updateHighlighter();
                     }
                     }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
-                    update_line_highlight();
                     display_instruction();
+                    lineHighlighPrinterObject().updateHighlighter();
                 }
                 }
             }
@@ -202,13 +212,8 @@ public class guiController
                 }
                 }
         
-        public void update_line_highlight(){
-
-            int current_program_counter = DebugFrame.simulatedMachine.programCounter();
-        }
         // nested class
         public class code_display{
-
 
             //ctor 
             public code_display(){
