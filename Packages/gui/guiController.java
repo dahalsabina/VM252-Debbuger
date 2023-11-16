@@ -226,7 +226,7 @@ public class guiController
                 String instruction = machineStepper().next_instruction(true, programCounter);
                 int instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
 
-                DebugFrame.input_code_area.append(programCounter + " " + instruction + "\n");
+                DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
 
                 // need to deal with LOAD null which is for variable declaration values
                 while (instruction != "STOP"){
@@ -235,13 +235,19 @@ public class guiController
                 instruction_length_in_bytes);
                 instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
                 instruction = machineStepper().next_instruction(true, programCounter);
+
+                String tmp_instruction; 
                 if (instruction.endsWith("LOAD null")){
 
                     // need to get the instruction address
                     int data = DebugFrame.simulatedMachine.memoryByte(programCounter+1);
-                    instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
+                    tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
+                } else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
+                    tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + instruction;
+                } else {
+                    tmp_instruction = instruction;
                 }
-                DebugFrame.input_code_area.append(programCounter + " " + instruction + "\n");
+                DebugFrame.input_code_area.append(programCounter + "    " + tmp_instruction + "\n");
 
                 }
             }

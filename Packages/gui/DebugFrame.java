@@ -52,19 +52,16 @@ class lineHighlightPrinter{
         int pc = myModel.programCounter();
         currentLine = getCurrentLine(pc);
         Highlighter high = myTextArea.getHighlighter();
-        // remove all highlights first, have to be careful with yellow highlights
 
         try {
         high.removeHighlight(currentHighlighter);}
         catch (NullPointerException e){
             System.out.println(e);
         }
-        //myHighlights.clear();
 
         int start = myTextArea.getLineStartOffset(currentLine);
         int end   = myTextArea.getLineEndOffset(currentLine);
         currentHighlighter = high.addHighlight(start,end,new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
-        // add to hash map with the line number it is at
         }
 
         catch (BadLocationException e) {
