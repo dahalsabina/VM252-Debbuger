@@ -119,6 +119,7 @@ class ProgramCounterPrinter extends VM252View
     public void updateProgramCounter()
     {        
         DebugFrame.count_diplay.setText(""+myModel.programCounter());
+        DebugFrame.lineHighlightPrinterObject.updateHighlighter();
         } 
     
     
