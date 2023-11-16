@@ -11,6 +11,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
+import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
 import vm252utilities.VM252Utilities;
@@ -224,30 +225,36 @@ public class guiController
                 DebugFrame.input_code_area.setText("");
                 int programCounter = 0;
                 String instruction = machineStepper().next_instruction(true, programCounter);
+                Instruction raw_instruction = machineStepper().get_raw_instruction(programCounter);
                 int instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
 
                 DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
 
                 // need to deal with LOAD null which is for variable declaration values
-                while (instruction != "STOP"){
+                while (raw_instruction.symbolicOpcode() != "STOP"){
 
                 programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
                 instruction_length_in_bytes);
                 instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
                 instruction = machineStepper().next_instruction(true, programCounter);
+                raw_instruction = machineStepper().get_raw_instruction(programCounter);
 
                 String tmp_instruction; 
                 if (instruction.endsWith("LOAD null")){
 
-                    // need to get the instruction address
-                    int data = DebugFrame.simulatedMachine.memoryByte(programCounter+1);
+                    byte [ ] dataBytes = machineStepper().fetchMemoryBytes(programCounter, 2);
+                    int data = ((short) (dataBytes[ 0 ] << 8 | dataBytes[ 1 ] & 0xff));
                     tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
-                } else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
+
+                } 
+                else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
                     tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + instruction;
                 } else {
                     tmp_instruction = instruction;
                 }
+
                 DebugFrame.input_code_area.append(programCounter + "    " + tmp_instruction + "\n");
+                //DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
 
                 }
             }

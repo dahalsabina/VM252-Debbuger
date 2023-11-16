@@ -3,7 +3,6 @@ package vm252simulation;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Scanner;
 
 import javax.swing.JOptionPane;
@@ -54,7 +53,7 @@ public class VM252Stepper
 
             }
 
-        private byte [ ] fetchMemoryBytes(int memoryAddress, int numberOfBytes)
+        public byte [ ] fetchMemoryBytes(int memoryAddress, int numberOfBytes)
         {
 
             byte [ ] memoryBytes = new byte [ Math.max(0, numberOfBytes) ];
@@ -177,12 +176,7 @@ public class VM252Stepper
                 if (instruction_length == 2) {
                     String symbolic_address = VM252Utilities.addressSymbolHashMap.get((int) memory_bytes_next_instruction[1]);
                     if (symbolic_address == null && nextInstruction.symbolicOpcode() == "SET"){
-
-                           symbolic_address = DebugFrame.simulatedMachine.memoryByte(memory_bytes_next_instruction[1]) + "";
-		               // int value= fetchMemoryData(1);
-		               // return currentInstruction.symbolicOpcode() + " " + value;
-		               // need to get what the value is just like SET something: Able to get the memory adress 
-		               // but need to get what is actually stored there
+                        symbolic_address = "" + currentInstruction.numericOperand();
                     }
                     return nextInstruction.symbolicOpcode() + " " + symbolic_address;
 
@@ -237,7 +231,7 @@ public class VM252Stepper
 
                         case VM252ArchitectureSpecifications.LOAD_OPCODE :
                             machineState().setAccumulator(
-                                fetchMemoryData(currentInstruction.numericOperand())
+                            fetchMemoryData(currentInstruction.numericOperand())
                                 );
                             break;
 
@@ -347,7 +341,7 @@ public class VM252Stepper
 
             }
 
-            public int get_instruction_bytes_length(int programCounter){
+            public Instruction get_raw_instruction(int programCounter){
 
                     Instruction currentInstruction;
                     try {
@@ -365,7 +359,14 @@ public class VM252Stepper
                                fetchMemoryBytes(programCounter, 1)
                                );
                         }
+                    return currentInstruction;
 
+
+            }
+
+            public int get_instruction_bytes_length(int programCounter){
+
+                    Instruction currentInstruction = get_raw_instruction(programCounter);
                     return currentInstruction.instructionBytes().length;
 
             }
