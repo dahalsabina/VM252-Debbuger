@@ -3,7 +3,9 @@ package gui;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
 import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
@@ -27,6 +29,8 @@ public class guiController
         private boolean simulation_started;
         private boolean simulation_paused;
         public code_display code_display_object;
+        
+
     //
     // Public Accessors
     //

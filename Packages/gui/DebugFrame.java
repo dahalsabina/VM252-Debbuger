@@ -1,20 +1,43 @@
 package gui;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import javax.swing.text.Element;
+
+
+
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252View;
-import gui.guiController.code_display;
+import gui.guiController.code_display;      
 
 import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+
+
+
 
 
 /**
@@ -143,6 +166,13 @@ public class DebugFrame extends javax.swing.JFrame {
     static String instruction_to_be_executed;
     static JButton button_clicked;
     public static VM252Model simulatedMachine;
+    private Set<Integer> breakpoints = new HashSet<>();
+    private Map<Integer, Object> highlightTags;
+   
+       
+       
+    
+    
     
     public static void reset_gui_components(boolean enable){
         Start.setEnabled(enable);
@@ -290,6 +320,10 @@ public class DebugFrame extends javax.swing.JFrame {
                 stopActionPerformed(evt);
             }
         });
+
+        setupMouseListener();
+        breakpoints = new HashSet<>(); // Initialize here
+        highlightTags = new HashMap<>();
        
         adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Speed", "Speed x1.5", "Speed x2" }));
 
@@ -781,7 +815,135 @@ public class DebugFrame extends javax.swing.JFrame {
     simulatedMachine.attach(stopAnnouncerObject);
 
     simulator = new guiController(simulatedMachine);
+
+
     }
+
+        
+
+// A generic Triple class to store a tuple of three elements
+public class Triple<T, U, V> {
+    public final T first;  // First element of the triple
+    public final U second; // Second element of the triple
+    public final V third;  // Third element of the triple
+
+    // Constructor to initialize the triple elements
+    public Triple(T first, U second, V third) {
+        this.first = first;
+        this.second = second;
+        this.third = third;
+    }
+}
+
+// Method to set up a mouse listener on the JTextArea 'memory_display_one'
+public void setupMouseListener() {
+    // Adding a mouse listener to 'memory_display_one'
+    memory_display_one.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            // Check if the mouse event is a double-click
+            if (e.getClickCount() == 2) {
+                // Get line information where the mouse was clicked
+                Triple<Integer, Integer, Integer> lineInfo = determineClickedLineLocation(
+                    memory_display_one, e.getX(), e.getY()
+                );
+
+                int line = lineInfo.first; // Extract the line number
+                toggleBreakpointAtLine(line); // Toggle breakpoint on this line
+            }
+        }
+    });
+}
+
+// Method to determine the clicked line location in the JTextArea
+Triple<Integer, Integer, Integer> determineClickedLineLocation(
+    JTextArea textAreaClicked, int xCoordinateOfClick, int yCoordinateOfClick) {
+
+    // Convert the click position to a text position in the JTextArea
+    int textPosition = textAreaClicked.viewToModel(new Point(xCoordinateOfClick, yCoordinateOfClick));
+    Document document = textAreaClicked.getDocument();
+    // Get the paragraph element (line) at the click position
+    Element paragraphElement = ((AbstractDocument)document).getParagraphElement(textPosition);
+    // Get the starting and ending offsets of the clicked line
+    int startingOffsetOfLine = paragraphElement.getStartOffset();
+    int endingOffsetOfLine = paragraphElement.getEndOffset();
+
+    int lineNumber=0;
+    try {
+        // Determine the line number from the starting offset
+        lineNumber = textAreaClicked.getLineOfOffset(startingOffsetOfLine);
+    } catch (BadLocationException e) {
+        ;
+        
+    }
+
+    // Return a Triple containing line number, starting offset, and ending offset
+    return new Triple<>(lineNumber, startingOffsetOfLine, endingOffsetOfLine);
+}
+
+    // Method to toggle a breakpoint on a specific line
+    private void toggleBreakpointAtLine(int line) {
+        if (breakpoints.contains(line)) {
+            // If breakpoint exists on the line, remove it
+            breakpoints.remove(line);
+            // Remove the visual highlight for the breakpoint
+            removeHighlightFromLine(line);
+        } else {
+            // If no breakpoint exists, add it
+            breakpoints.add(line);
+            // Add visual highlight to indicate the breakpoint
+            addHighlightToLine(line);
+        }
+    }
+
+    // Method to add a visual highlight to a line
+    private void addHighlightToLine(int line) {
+        try {
+            // Get the start and end offsets of the line
+            int startOffset = memory_display_one.getLineStartOffset(line);
+            int endOffset = memory_display_one.getLineEndOffset(line);
+            
+            HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
+
+            // Get the highlighter of the JTextArea and add highlight
+            Highlighter highlighter = memory_display_one.getHighlighter();
+            Object tag = highlighter.addHighlight(startOffset, endOffset, painter);
+            // Store the highlight tag for future reference
+            highlightTags.put(line, tag);
+        } catch (BadLocationException e) {
+            e.printStackTrace(); // Print the stack trace in case of an exception
+        }
+    }
+
+    // Method to remove a visual highlight from a line
+    private void removeHighlightFromLine(int line) {
+        // Get the highlighter of the JTextArea
+        Highlighter highlighter = memory_display_one.getHighlighter();
+        // Retrieve the stored highlight tag
+        Object tag = highlightTags.get(line);
+        if (tag != null) {
+            // If the tag exists, remove the highlight and the tag
+            highlighter.removeHighlight(tag);
+            highlightTags.remove(line);
+        }
+    }
+
+            private void processBreakpoints() {
+                // Process the breakpoints as needed, e.g., update the simulator
+                
+                
+            }
+   
+
+
+
+
+
+
+
+
+
+
 
     private void selectFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFileActionPerformed
 
