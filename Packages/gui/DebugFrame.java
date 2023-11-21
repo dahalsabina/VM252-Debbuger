@@ -575,25 +575,38 @@ public class DebugFrame extends javax.swing.JFrame {
         input_code_scroll.setViewportView(input_code_area);
         input_code_area.getAccessibleContext().setAccessibleParent(Bottom_West);
 
+        memory_display_two.setEditable(false);
+        memory_display_two.setColumns(20);
+        memory_display_two.setRows(5);
+        memory_display_scroll_two.setViewportView(memory_display_two);
+
+        memory_options_two.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Object code as bytes in Hex", "Object code as 2 byte data in Hex", "Object code as instructions-data and labels", "Edit" }));
+        memory_options_two.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                memory_options_twoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout Bottom_WestLayout = new javax.swing.GroupLayout(Bottom_West);
         Bottom_West.setLayout(Bottom_WestLayout);
         Bottom_WestLayout.setHorizontalGroup(
             Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-            .addGroup(Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(Bottom_WestLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(input_code_scroll, javax.swing.GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addGroup(Bottom_WestLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(input_code_scroll)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(memory_options_two, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(Bottom_WestLayout.createSequentialGroup()
+                        .addComponent(memory_display_scroll_two))))
         );
         Bottom_WestLayout.setVerticalGroup(
             Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-            .addGroup(Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(Bottom_WestLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(input_code_scroll, javax.swing.GroupLayout.PREFERRED_SIZE, 531, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(90, Short.MAX_VALUE)))
+            .addGroup(Bottom_WestLayout.createSequentialGroup()
+                .addComponent(memory_options_two, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(memory_display_scroll_two))
+            .addComponent(input_code_scroll)
         );
 
         Bottom_East.setBackground(new java.awt.Color(153, 153, 153));
@@ -674,9 +687,10 @@ public class DebugFrame extends javax.swing.JFrame {
         Center_Bottom_EastLayout.setHorizontalGroup(
             Center_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(Center_Bottom_EastLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
                 .addGroup(Center_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(memory_display_scroll_one)
-                    .addComponent(memory_options_one, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(memory_options_one, 0, 397, Short.MAX_VALUE)
+                    .addComponent(memory_display_scroll_one))
                 .addContainerGap())
         );
         Center_Bottom_EastLayout.setVerticalGroup(
@@ -684,42 +698,11 @@ public class DebugFrame extends javax.swing.JFrame {
             .addGroup(Center_Bottom_EastLayout.createSequentialGroup()
                 .addComponent(memory_options_one, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(memory_display_scroll_one, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0))
-        );
-
-        Last_Bottom_East.setBackground(new java.awt.Color(153, 153, 153));
-
-        memory_options_two.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Object code as bytes in Hex", "Object code as 2 byte data in Hex", "Object code as instructions-data and labels", "Edit" }));
-        memory_options_two.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                memory_options_twoActionPerformed(evt);
-            }
-        });
-
-        memory_display_two.setEditable(false);
-        memory_display_two.setColumns(20);
-        memory_display_two.setRows(5);
-        memory_display_scroll_two.setViewportView(memory_display_two);
-
-        javax.swing.GroupLayout Last_Bottom_EastLayout = new javax.swing.GroupLayout(Last_Bottom_East);
-        Last_Bottom_East.setLayout(Last_Bottom_EastLayout);
-        Last_Bottom_EastLayout.setHorizontalGroup(
-            Last_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(Last_Bottom_EastLayout.createSequentialGroup()
-                .addGroup(Last_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(memory_options_two, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(memory_display_scroll_two))
+                .addComponent(memory_display_scroll_one, javax.swing.GroupLayout.PREFERRED_SIZE, 393, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
-        Last_Bottom_EastLayout.setVerticalGroup(
-            Last_Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(Last_Bottom_EastLayout.createSequentialGroup()
-                .addComponent(memory_options_two, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(memory_display_scroll_two, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+
+        
 
         javax.swing.GroupLayout Bottom_EastLayout = new javax.swing.GroupLayout(Bottom_East);
         Bottom_East.setLayout(Bottom_EastLayout);
@@ -731,8 +714,7 @@ public class DebugFrame extends javax.swing.JFrame {
                     .addGroup(Bottom_EastLayout.createSequentialGroup()
                         .addComponent(Top_Bottom_East, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
-                    .addComponent(Center_Bottom_East, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(Last_Bottom_East, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(Center_Bottom_East, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         Bottom_EastLayout.setVerticalGroup(
             Bottom_EastLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -740,8 +722,6 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addComponent(Top_Bottom_East, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(Center_Bottom_East, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Last_Bottom_East, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -751,7 +731,7 @@ public class DebugFrame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(Bottom_West, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(0, 0, 0)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(Bottom_East, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
@@ -768,9 +748,7 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(Bottom_West, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(Bottom_East, javax.swing.GroupLayout.PREFERRED_SIZE, 537, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 6, Short.MAX_VALUE))))
+                    .addComponent(Bottom_East, javax.swing.GroupLayout.PREFERRED_SIZE, 537, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         pack();
