@@ -5,7 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
@@ -16,6 +18,7 @@ import vm252architecturespecifications.VM252ArchitectureSpecifications;
 import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
+import vm252simulation.VM252Model.StoppedCategory;
 import vm252utilities.VM252Utilities;
 
 
@@ -34,6 +37,7 @@ public class guiController
         public code_display code_display_object;
         private javax.swing.Timer timer;
         private double myRunSpeed;
+        
     //
     // Public Accessors
     //
