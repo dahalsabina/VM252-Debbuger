@@ -21,7 +21,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import javax.swing.text.Element;
-import javax.swing.Icon;
+import javax.swing.*;
 import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
@@ -261,14 +261,19 @@ public class DebugFrame extends javax.swing.JFrame {
         Upper_Panel = new javax.swing.JPanel();
         selectFile = new javax.swing.JButton();
         file_Selected = new javax.swing.JTextField();
-        Icon helpIcon = new ImageIcon("C: ./icons/Help_Icon.png");
-        Help = new javax.swing.JButton(helpIcon);
+        JButton Help = new JButton(new ImageIcon("C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\helpicon.png"));
+        Help.setBounds(100,100,100,50);
         Button_Panel = new javax.swing.JPanel();
-        Start = new javax.swing.JButton();
-        Pause = new javax.swing.JButton();
-        next_Line = new javax.swing.JButton();
-        executeAgain = new javax.swing.JButton();
-        Stop = new javax.swing.JButton();
+        Start = new javax.swing.JButton(new ImageIcon("C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\starticon.png"));
+        Start.setBounds(100,100,100,50);
+        Pause = new javax.swing.JButton(new ImageIcon("C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\pauseicon.png"));
+        Pause.setBounds(100,100,100,50);
+        next_Line = new javax.swing.JButton(new ImageIcon("C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\nexticon.png"));
+        next_Line.setBounds(100,100,100,100);
+        executeAgain = new javax.swing.JButton(new ImageIcon("C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\reseticon.png"));
+        executeAgain.setBounds(100,100,100,50);
+        Stop = new javax.swing.JButton(new ImageIcon("C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\stopicon.png"));
+        Stop.setBounds(100,100,100,50);
         adjust_Speed = new javax.swing.JComboBox<>();
         Middle_Panel = new javax.swing.JPanel();
         Middle_West = new javax.swing.JPanel();
@@ -331,35 +336,35 @@ public class DebugFrame extends javax.swing.JFrame {
             }
         });
 
-        Help.setLabel("Help");
+        
         Help.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 HelpActionPerformed(evt);
             }
         });
 
-        Start.setText("Start");
+       
         Start.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 StartActionPerformed(evt);
             }
         });
 
-        Pause.setText("Pause");
+        
         Pause.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt){
                 PauseActionPerformed(evt);
             }
         });
 
-        next_Line.setText("Next line");
+        
         next_Line.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt){
                 NextActionPerformed(evt);
             }
         });
 
-        executeAgain.setText("Again");
+        
         executeAgain.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 executeAgainActionPerformed(evt);
@@ -382,7 +387,7 @@ public class DebugFrame extends javax.swing.JFrame {
         
         
 
-        Stop.setText("Stop");
+        
         Stop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt){
                 stopActionPerformed(evt);
@@ -394,6 +399,7 @@ public class DebugFrame extends javax.swing.JFrame {
         highlightTags = new HashMap<>();
        
         adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Speed x1.0", "Speed x0.75", "Speed x0.5", "Speed x0.25"}));
+        
         javax.swing.GroupLayout Button_PanelLayout = new javax.swing.GroupLayout(Button_Panel);
         Button_Panel.setLayout(Button_PanelLayout);
         Button_PanelLayout.setHorizontalGroup(
@@ -454,7 +460,7 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(Upper_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(selectFile, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Help, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(Help))
                 .addGap(0, 0, 0)
                 .addComponent(file_Selected, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
