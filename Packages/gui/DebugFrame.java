@@ -976,7 +976,7 @@ private void addHighlightToLine(JTextArea textArea, int line) {
             Highlighter highlighter = textArea.getHighlighter();
             Object tag = highlighter.addHighlight(startOffset, endOffset, painter);
 
-            // Store the highlight tag in the appropriate map (based on the JTextArea)
+            // Store the highlight tag in the appropriate map 
             
             if (textArea == memory_display_two) {
                 memoryDisplayHighlightTags.put(line, tag);
@@ -1072,7 +1072,10 @@ private void synchronizeHighlights(int line) {
          count_diplay.setText("0");
          accumulator_display.setText("0");
          instruction_Display.setText("");
-         DebugFrame.memory_display_one.setText(" ");
+         input_code_area.setText(" ");
+         memory_display_two.setText(" ");
+         memory_display_one.setText(" ");
+         
          try {
             create_simulation_machine();
         } catch (IOException e) {
