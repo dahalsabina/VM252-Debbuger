@@ -49,13 +49,44 @@ import java.awt.event.MouseAdapter;
         // nested class
 class code_display{
 
-            //ctor 
+    //ctor 
     public VM252Stepper myStepper;
+    public String typeOfDisplay = "bytes";
 
     public code_display(VM252Stepper stepper){
             myStepper = stepper;
             }
 
+    public void display_entire_memory(){
+        // type can be as machine memory as bytes in hex
+        // or 2byte data in hex
+        // type will be either "two-byte" or "bytes"
+        
+        DebugFrame.memory_display_one.setText("");
+        for (int address = 0; address < VM252ArchitectureSpecifications.MEMORY_SIZE_IN_BYTES; address ++){
+
+            byte data = DebugFrame.memoryBytePrinterObject.get_data(address);
+            if (address % 20 == 0) {
+                if (typeOfDisplay == "bytes"){
+                DebugFrame.memory_display_one.append(String.format("[Addr %d] %02x", address, data));
+                } else  DebugFrame.memory_display_one.append(String.format("[Addr %d] %02x", address, data));
+            }
+            else if (address % 20 == 19) {
+                if (typeOfDisplay == "bytes"){
+                DebugFrame.memory_display_one.append(String.format(" %02x\n", data));
+                } else DebugFrame.memory_display_one.append(String.format("%02x\n", data));
+            }
+            else  {
+                if (typeOfDisplay == "bytes" || address % 2 == 0){
+                DebugFrame.memory_display_one.append(String.format(" %02x", data));
+                } else
+                DebugFrame.memory_display_one.append(String.format("%02x", data));
+            
+        }
+
+    }
+    DebugFrame.memory_display_one.setCaretPosition(0);
+}
     public void display_code_in_memory_bytes_format(){
 
         DebugFrame.memory_display_two.setText("");
@@ -89,6 +120,7 @@ class code_display{
             public void display_code_in_human_readable_format(){
 
                 display_code_in_memory_bytes_format();
+                display_entire_memory();
                 DebugFrame.input_code_area.setText("");
 
                 int programCounter = 0;
@@ -315,6 +347,7 @@ public class DebugFrame extends javax.swing.JFrame {
     String objFileName = "";
     static guiController simulator;
     static accumulatorPrinter accumulatorPrinterObject;
+    static code_display code_display_object;
     static lineHighlightPrinter lineHighlightPrinterObject;
     static ProgramCounterPrinter programCounterPrinterObject;
     static StopAnnouncer stopAnnouncerObject;
@@ -794,7 +827,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         Center_Bottom_East.setBackground(new java.awt.Color(153, 153, 153));
 
-        memory_options_one.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Object code as bytes in Hex", "Object code as 2 byte data in Hex", "Object code as instructions-data and labels", "Edit" }));
+        memory_options_one.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Machine memory as bytes in Hex", "Machine memory as 2 byte data in Hex", "Edit" }));
         memory_options_one.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 memory_options_oneActionPerformed(evt);
@@ -883,6 +916,17 @@ public class DebugFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_file_SelectedActionPerformed
 
     private void memory_options_oneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memory_options_oneActionPerformed
+
+            String line = (String) memory_options_one.getSelectedItem();
+            if (line.contains("2 byte data")){
+                // 2 byte data
+                code_display_object.typeOfDisplay = "two-byte";
+                code_display_object.display_entire_memory();
+            } else {
+                // as bytes
+                code_display_object.typeOfDisplay = "bytes";
+                code_display_object.display_entire_memory();
+            }
         // TODO add your handling code here:
     }//GEN-LAST:event_memory_options_oneActionPerformed
 
@@ -961,8 +1005,11 @@ public class DebugFrame extends javax.swing.JFrame {
 
     simulator = new guiController(simulatedMachine, lineHighlightPrinterObject);
     simulator.loadFile(objFileName, new Scanner(System.in), System.out);
-    lineHighlightPrinterObject.updateHighlighter();
+    code_display_object = new code_display(simulator.machineStepper());
 
+    simulator.setCodeDisplayObject(code_display_object);
+    code_display_object.display_code_in_human_readable_format();
+    lineHighlightPrinterObject.updateHighlighter();
     // also put the first instruction
     instruction_Display.setText(simulator.machineStepper().next_instruction(true, 0));
     }

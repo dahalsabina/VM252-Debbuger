@@ -81,6 +81,13 @@ public class guiController
 
             }
 
+        public void setCodeDisplayObject(gui.code_display code_display)
+        {
+
+            code_display_object = code_display;
+        }
+
+
     //
     // Public Ctors
     //
@@ -164,10 +171,8 @@ public class guiController
 
                 for (int address = 0; address < objectCode.length; ++ address)
                         machineState().setMemoryByte(address, objectCode[ address ]);
-           
+            }
 
-                code_display_object = new code_display(myMachineStepper);
-                code_display_object.display_code_in_human_readable_format();}
 
         }
 
