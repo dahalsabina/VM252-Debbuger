@@ -93,8 +93,8 @@ public class guiController
             this.simulation_paused = false;
             setMachineState(simulatedMachine);
             myLineHighlightPrinterObject = lineHighlightPrinterObject;
+            myRunSpeed = DebugFrame.getRunSpeedFromSpeedComponent();
             create_timer();
-            myRunSpeed = 1;
 
             }
 
@@ -156,7 +156,7 @@ public class guiController
             if (objectCode != null) {
 
             setMachineStepper(
-                new VM252Stepper(machineState(), machineInputStream, machineOutputStream)
+                new VM252Stepper(machineState(), machineInputStream, machineOutputStream, this)
                     );
 
                 //
@@ -190,7 +190,7 @@ public class guiController
                                     display_instruction();
                                     lineHighlighPrinterObject().updateHighlighter();
                                 }
-                            else stop_timer();;}
+                                    else stop_timer();}
                     });
 
         }

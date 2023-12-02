@@ -225,7 +225,21 @@ public class DebugFrame extends javax.swing.JFrame {
    
        
        
-    
+    public static Double getRunSpeedFromSpeedComponent(){
+
+            String line = (String) DebugFrame.adjust_Speed.getSelectedItem();
+            if (line == "Speed ∞") {
+                return (double) 2;
+            }
+            else {
+                Pattern pattern = Pattern.compile("x([102].[0-9]{1,2}).*");
+                Matcher matcher = pattern.matcher(line);
+                matcher.find();
+                return Double.parseDouble(matcher.group(1));
+                }
+            }
+
+
     
     
     public static void reset_gui_components(boolean enable){
@@ -233,6 +247,7 @@ public class DebugFrame extends javax.swing.JFrame {
         next_Line.setEnabled(enable);
         Stop.setEnabled(enable);
         Pause.setEnabled(enable);
+        
 
         if (enable) {
             DebugFrame.output_text.setText("");
@@ -371,15 +386,12 @@ public class DebugFrame extends javax.swing.JFrame {
             }
         });
        
+
         adjust_Speed.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 if (simulator != null) {
-                String line = (String) adjust_Speed.getSelectedItem();
-                Pattern pattern = Pattern.compile("x([102].[0-9]{1,2}).*");
-                Matcher matcher = pattern.matcher(line);
-                matcher.find();
-                simulator.setRunSpeed(Double.parseDouble(matcher.group(1)));
-
+                Double runSpeed = getRunSpeedFromSpeedComponent();
+                simulator.setRunSpeed(runSpeed);
                 }
             }
         });
@@ -400,7 +412,7 @@ public class DebugFrame extends javax.swing.JFrame {
         memoryDisplayHighlightTags = new HashMap<>();
         inputCodeAreaHighlightTags = new HashMap<>();
        
-        adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Speed x1.0", "Speed x0.75", "Speed x0.5", "Speed x0.25"}));
+        adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"Speed ∞", "Speed x1.0", "Speed x0.75", "Speed x0.5", "Speed x0.25"}));
         
         javax.swing.GroupLayout Button_PanelLayout = new javax.swing.GroupLayout(Button_Panel);
         Button_Panel.setLayout(Button_PanelLayout);
@@ -1147,7 +1159,7 @@ private void synchronizeHighlights(int line) {
     private javax.swing.JPanel Upper_Panel;
     private javax.swing.JLabel accumulator;
     public static javax.swing.JTextField accumulator_display;
-    private javax.swing.JComboBox<String> adjust_Speed;
+    private static javax.swing.JComboBox<String> adjust_Speed;
     public static javax.swing.JTextField count_diplay;
     public static javax.swing.JTextArea output_text;
     private javax.swing.JButton executeAgain;

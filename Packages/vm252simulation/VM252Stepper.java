@@ -8,6 +8,7 @@ import java.util.Scanner;
 import javax.swing.JOptionPane;
 
 import gui.DebugFrame;
+import gui.guiController;
 
 import java.lang.Math;
 
@@ -27,6 +28,7 @@ public class VM252Stepper
         private VM252Model myMachineState;
         private Scanner myMachineInputStream;
         private PrintStream myMachineOutputStream;
+        private guiController myMachineGuiController;
 
     //
     // Public Accessors
@@ -38,6 +40,12 @@ public class VM252Stepper
             return myMachineState;
 
             }
+
+        public guiController machineGUIController()
+        {
+
+            return myMachineGuiController;
+        }
 
         public Scanner machineInputStream()
         {
@@ -103,13 +111,15 @@ public class VM252Stepper
         public VM252Stepper(
                 VM252Model machineState,
                 Scanner machineInputStream,
-                PrintStream machineOutputStream
+                PrintStream machineOutputStream,
+                guiController guiController
                 )
         {
 
             myMachineState = machineState;
             myMachineInputStream = machineInputStream;
             myMachineOutputStream = machineOutputStream;
+            myMachineGuiController = guiController;
             }
 
     //
@@ -297,6 +307,12 @@ public class VM252Stepper
                                 valid_input_received = true;
                             } catch (NumberFormatException e) {
                                 // run the loop again till we get a valid input
+                            }
+                            try {
+                                double speed = DebugFrame.getRunSpeedFromSpeedComponent();
+                                if (speed != 2) Thread.sleep(((int) (2-speed) * 1000));
+                            } catch (Exception e) {
+                                // TODO: handle exception
                             }
                         }
                             // show the input provided in the events of the gui
