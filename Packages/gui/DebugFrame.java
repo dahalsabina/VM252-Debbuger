@@ -43,57 +43,68 @@ import java.awt.event.MouseAdapter;
 class lineHighlightPrinter{
 
     private final VM252Model myModel;
-    private final JTextArea myTextArea;
-    private int currentLine;
-    private Object currentHighlighter;
+    private final JTextArea myTextArea1;
+    private final JTextArea myTextArea2;
+    private int currentLine1;
+    private int currentLine2;
+    private Object currentHighlighter1;
+    private Object currentHighlighter2;
 
-    public int getCurrentLine(int pc_value){
+    public int getCurrentLine(int pc_value, JTextArea textArea){
         int line_number = 0;
-        String [] list_of_lines =myTextArea.getText().split("\n");
+        String [] list_of_lines =textArea.getText().split("\n");
         for (String line: list_of_lines){
-            if (line.startsWith(""+pc_value)){
+            if (textArea.equals(myTextArea1) && line.startsWith(""+pc_value)){
+                    break;
+                }
+            else if (textArea.equals(myTextArea2) && line.startsWith("[Addr "+pc_value)){
                 break;
             }
             line_number++;
         }
-        currentLine = line_number;
-        return currentLine;
-    }
+        return line_number;
+        }
 
     public void updateHighlighter(){
 
         try {
         int pc = myModel.programCounter();
-        currentLine = getCurrentLine(pc);
-        Highlighter high = myTextArea.getHighlighter();
+        currentLine1 = getCurrentLine(pc, myTextArea1);
+        currentLine2 = getCurrentLine(pc, myTextArea2);
+        Highlighter high1 = myTextArea1.getHighlighter();
+        Highlighter high2 = myTextArea2.getHighlighter();
 
         try {
-        high.removeHighlight(currentHighlighter);}
+        high1.removeHighlight(currentHighlighter1);
+        high2.removeHighlight(currentHighlighter2);
+    }
         catch (NullPointerException e){
             System.out.println(e);
         }
 
-        int start = myTextArea.getLineStartOffset(currentLine);
-        int end   = myTextArea.getLineEndOffset(currentLine);
-        currentHighlighter = high.addHighlight(start,end,new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
-        }
+        int start1 = myTextArea1.getLineStartOffset(currentLine1);
+        int end1   = myTextArea1.getLineEndOffset(currentLine1);
+
+        int start2 = myTextArea2.getLineStartOffset(currentLine2);
+        int end2   = myTextArea2.getLineEndOffset(currentLine2);
+
+        currentHighlighter1 = high1.addHighlight(start1,end1,new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+        currentHighlighter2 = high2.addHighlight(start2,end2,new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+    }
 
         catch (BadLocationException e) {
             }
         }
     
-    public lineHighlightPrinter(VM252Model model, JTextArea textArea)
+    public lineHighlightPrinter(VM252Model model, JTextArea textArea1, JTextArea textArea2)
     {       
         myModel = model;       
-        myTextArea = textArea;
-        currentLine = 1;
+        myTextArea1 = textArea1;
+        myTextArea2 = textArea2;
+        currentLine1 = 1;
+        currentLine2 = 1;
         }
    
-    public void setCurrentLine(int value){
-        currentLine = value;
-    
-    }
-
         }
 
 class accumulatorPrinter extends VM252View {
@@ -223,11 +234,9 @@ public class DebugFrame extends javax.swing.JFrame {
     static String instruction_to_be_executed;
     static JButton button_clicked;
     public static VM252Model simulatedMachine;
-    private Set<Integer> breakpoints;
+    static Set<Integer> breakpoints;
     private Map<Integer, Object> memoryDisplayHighlightTags;
     private Map<Integer, Object> inputCodeAreaHighlightTags;
-   
-       
        
     
     
@@ -867,7 +876,7 @@ public class DebugFrame extends javax.swing.JFrame {
     programCounterPrinterObject = new ProgramCounterPrinter(simulatedMachine);
     stopAnnouncerObject = new StopAnnouncer(simulatedMachine);
     memoryBytePrinterObject = new MemoryBytePrinter(simulatedMachine);
-    lineHighlightPrinterObject = new lineHighlightPrinter(simulatedMachine, DebugFrame.input_code_area);
+    lineHighlightPrinterObject = new lineHighlightPrinter(simulatedMachine, DebugFrame.input_code_area, DebugFrame.memory_display_two);
 
     simulatedMachine.attach(accumulatorPrinterObject);
     simulatedMachine.attach(programCounterPrinterObject);
@@ -996,7 +1005,7 @@ private void addHighlightToLine(JTextArea textArea, int line) {
 
 
 
-private void removeHighlightFromLine(JTextArea textArea, int line) {
+    private void removeHighlightFromLine(JTextArea textArea, int line) {
     Highlighter highlighter = textArea.getHighlighter();
     // Determine which highlight tag map to use based on the JTextArea
     // If the JTextArea is memory_display_two, use memoryDisplayHighlightTags

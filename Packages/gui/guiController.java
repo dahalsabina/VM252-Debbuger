@@ -187,6 +187,8 @@ public class guiController
                                     }   catch (IOException e1) {
                                         System.out.println(e1);
                                 }
+                                    // This will reset the memory_display_2 JTextArea, so need to show highlighter and breakpoints again if any
+                                    code_display_object.display_code_in_memory_bytes_format();
                                     display_instruction();
                                     lineHighlighPrinterObject().updateHighlighter();
                                 }
@@ -241,6 +243,7 @@ public class guiController
                 if (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
+                        code_display_object.display_code_in_memory_bytes_format();
                 } else {
                 }
                 }
