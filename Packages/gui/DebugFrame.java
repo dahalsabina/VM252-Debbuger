@@ -302,7 +302,6 @@ public class DebugFrame extends javax.swing.JFrame {
         memory_display_scroll_one = new javax.swing.JScrollPane();
         memory_display_one = new javax.swing.JTextArea();
         Last_Bottom_East = new javax.swing.JPanel();
-        memory_options_two = new javax.swing.JComboBox<>();
         memory_display_scroll_two = new javax.swing.JScrollPane();
         memory_display_two = new javax.swing.JTextArea();
 
@@ -612,13 +611,6 @@ public class DebugFrame extends javax.swing.JFrame {
         memory_display_two.setRows(5);
         memory_display_scroll_two.setViewportView(memory_display_two);
 
-        memory_options_two.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Object code as bytes in Hex", "Object code as 2 byte data in Hex", "Object code as instructions-data and labels", "Edit" }));
-        memory_options_two.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                memory_options_twoActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout Bottom_WestLayout = new javax.swing.GroupLayout(Bottom_West);
         Bottom_West.setLayout(Bottom_WestLayout);
         Bottom_WestLayout.setHorizontalGroup(
@@ -628,14 +620,12 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addComponent(input_code_scroll)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(memory_options_two, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(Bottom_WestLayout.createSequentialGroup()
                         .addComponent(memory_display_scroll_two))))
         );
         Bottom_WestLayout.setVerticalGroup(
             Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(Bottom_WestLayout.createSequentialGroup()
-                .addComponent(memory_options_two, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(memory_display_scroll_two))
             .addComponent(input_code_scroll)
@@ -793,10 +783,6 @@ public class DebugFrame extends javax.swing.JFrame {
     private void memory_options_oneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memory_options_oneActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_memory_options_oneActionPerformed
-
-    private void memory_options_twoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memory_options_twoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_memory_options_twoActionPerformed
 
     private void NextActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
         try {
@@ -1176,7 +1162,6 @@ private void synchronizeHighlights(int line) {
     public static javax.swing.JScrollPane memory_display_scroll_two;
     public static javax.swing.JTextArea memory_display_two;
     public static javax.swing.JComboBox<String> memory_options_one;
-    private javax.swing.JComboBox<String> memory_options_two;
     private javax.swing.JLabel next_Instruction;
     private static javax.swing.JButton next_Line;
     public static javax.swing.JTextArea event_display;
