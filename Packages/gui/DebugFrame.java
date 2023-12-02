@@ -163,6 +163,10 @@ class MemoryBytePrinter extends VM252View
         DebugFrame.memory_display_two.append(formattedString);       
 
         }
+    
+    public byte get_data(int address){
+        return myModel.memoryByte(address);
+    }
 
     }
 
@@ -609,6 +613,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         memory_display_two.setEditable(false);
         memory_display_two.setColumns(20);
+        memory_display_two.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
         memory_display_two.setRows(5);
         memory_display_scroll_two.setViewportView(memory_display_two);
 

@@ -253,8 +253,41 @@ public class guiController
 
             }
 
+            public void display_code_in_memory_bytes_format(){
+
+                DebugFrame.memory_display_two.setText("");
+                int programCounter = 0;
+                int instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
+                Instruction raw_instruction = machineStepper().get_raw_instruction(programCounter);
+
+                while (true){
+
+                    if (instruction_length_in_bytes == 1){
+
+                    byte data = DebugFrame.memoryBytePrinterObject.get_data(programCounter);
+                    DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x\n", programCounter, data));
+
+                    } else {
+
+                    byte data1 = DebugFrame.memoryBytePrinterObject.get_data(programCounter);
+                    byte data2 = DebugFrame.memoryBytePrinterObject.get_data(programCounter + 1);
+                    DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x %02x\n", programCounter,data1,data2));
+
+                    }
+                    if (raw_instruction.symbolicOpcode() == "STOP")break;
+                    programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
+                    instruction_length_in_bytes);
+                    instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
+                    raw_instruction = machineStepper().get_raw_instruction(programCounter);
+
+                }
+            }
+
             public void display_code_in_human_readable_format(){
+
+                display_code_in_memory_bytes_format();
                 DebugFrame.input_code_area.setText("");
+
                 int programCounter = 0;
                 String instruction = machineStepper().next_instruction(true, programCounter);
                 Instruction raw_instruction = machineStepper().get_raw_instruction(programCounter);
