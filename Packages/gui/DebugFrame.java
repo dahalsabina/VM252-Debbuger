@@ -17,6 +17,10 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
+
+import vm252architecturespecifications.VM252ArchitectureSpecifications;
+import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
+
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -25,7 +29,9 @@ import javax.swing.*;
 import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
+import vm252simulation.VM252Stepper;
 import vm252simulation.VM252View;
+import vm252utilities.VM252Utilities;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,6 +45,88 @@ import java.awt.event.MouseAdapter;
  * 
  * @author : Abigail Wood, Sabina Dahal, and Supreme Paudel
  */
+
+        // nested class
+class code_display{
+
+            //ctor 
+    public VM252Stepper myStepper;
+
+    public code_display(VM252Stepper stepper){
+            myStepper = stepper;
+            }
+
+    public void display_code_in_memory_bytes_format(){
+
+        DebugFrame.memory_display_two.setText("");
+        int programCounter = 0;
+        int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+        Instruction raw_instruction = myStepper.get_raw_instruction(programCounter);
+
+        while (true){
+
+            if (instruction_length_in_bytes == 1){
+
+            byte data = DebugFrame.memoryBytePrinterObject.get_data(programCounter);
+            DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x\n", programCounter, data));
+
+            } else {
+
+            byte data1 = DebugFrame.memoryBytePrinterObject.get_data(programCounter);
+            byte data2 = DebugFrame.memoryBytePrinterObject.get_data(programCounter + 1);
+            DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x %02x\n", programCounter,data1,data2));
+
+            }
+            if (raw_instruction.symbolicOpcode() == "STOP")break;
+            programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
+            instruction_length_in_bytes);
+            instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+            raw_instruction = myStepper.get_raw_instruction(programCounter);
+
+            }
+        }
+
+            public void display_code_in_human_readable_format(){
+
+                display_code_in_memory_bytes_format();
+                DebugFrame.input_code_area.setText("");
+
+                int programCounter = 0;
+                String instruction = myStepper.next_instruction(true, programCounter);
+                Instruction raw_instruction = myStepper.get_raw_instruction(programCounter);
+                int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+
+                DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
+
+                // need to deal with LOAD null which is for variable declaration values
+                while (raw_instruction.symbolicOpcode() != "STOP"){
+
+                programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
+                instruction_length_in_bytes);
+                instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+                instruction = myStepper.next_instruction(true, programCounter);
+                raw_instruction = myStepper.get_raw_instruction(programCounter);
+
+                String tmp_instruction; 
+                if (instruction.endsWith("LOAD null")){
+
+                    byte [ ] dataBytes = myStepper.fetchMemoryBytes(programCounter, 2);
+                    int data = ((short) (dataBytes[ 0 ] << 8 | dataBytes[ 1 ] & 0xff));
+                    tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
+
+                } 
+                else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
+                    tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + instruction;
+                } else {
+                    tmp_instruction = instruction;
+                }
+
+                DebugFrame.input_code_area.append(programCounter + "    " + tmp_instruction + "\n");
+                //DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
+
+                }
+            }
+        }
 
 class lineHighlightPrinter{
 
@@ -315,7 +403,6 @@ public class DebugFrame extends javax.swing.JFrame {
         memory_display_scroll_one = new javax.swing.JScrollPane();
         memory_display_one = new javax.swing.JTextArea();
         Last_Bottom_East = new javax.swing.JPanel();
-        memory_options_two = new javax.swing.JComboBox<>();
         memory_display_scroll_two = new javax.swing.JScrollPane();
         memory_display_two = new javax.swing.JTextArea();
 
@@ -626,13 +713,6 @@ public class DebugFrame extends javax.swing.JFrame {
         memory_display_two.setRows(5);
         memory_display_scroll_two.setViewportView(memory_display_two);
 
-        memory_options_two.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Object code as bytes in Hex", "Object code as 2 byte data in Hex", "Object code as instructions-data and labels", "Edit" }));
-        memory_options_two.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                memory_options_twoActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout Bottom_WestLayout = new javax.swing.GroupLayout(Bottom_West);
         Bottom_West.setLayout(Bottom_WestLayout);
         Bottom_WestLayout.setHorizontalGroup(
@@ -642,14 +722,12 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addComponent(input_code_scroll)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(memory_options_two, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(Bottom_WestLayout.createSequentialGroup()
                         .addComponent(memory_display_scroll_two))))
         );
         Bottom_WestLayout.setVerticalGroup(
             Bottom_WestLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(Bottom_WestLayout.createSequentialGroup()
-                .addComponent(memory_options_two, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(memory_display_scroll_two))
             .addComponent(input_code_scroll)
@@ -807,10 +885,6 @@ public class DebugFrame extends javax.swing.JFrame {
     private void memory_options_oneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memory_options_oneActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_memory_options_oneActionPerformed
-
-    private void memory_options_twoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memory_options_twoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_memory_options_twoActionPerformed
 
     private void NextActionPerformed(java.awt.event.ActionEvent evt){//GEN-FIRST:event_StartActionPerformed
         try {
@@ -1190,7 +1264,6 @@ private void synchronizeHighlights(int line) {
     public static javax.swing.JScrollPane memory_display_scroll_two;
     public static javax.swing.JTextArea memory_display_two;
     public static javax.swing.JComboBox<String> memory_options_one;
-    private javax.swing.JComboBox<String> memory_options_two;
     private javax.swing.JLabel next_Instruction;
     private static javax.swing.JButton next_Line;
     public static javax.swing.JTextArea event_display;

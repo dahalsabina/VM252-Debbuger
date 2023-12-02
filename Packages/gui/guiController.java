@@ -21,10 +21,8 @@ import vm252simulation.VM252Stepper;
 import vm252simulation.VM252Model.StoppedCategory;
 import vm252utilities.VM252Utilities;
 
-
 public class guiController
 {
-
     //
     // Private Instance Fields
     //
@@ -34,7 +32,7 @@ public class guiController
         private lineHighlightPrinter myLineHighlightPrinterObject;
         private boolean simulation_started;
         private boolean simulation_paused;
-        public code_display code_display_object;
+        public gui.code_display code_display_object;
         private javax.swing.Timer timer;
         private double myRunSpeed;
         
@@ -167,7 +165,8 @@ public class guiController
                 for (int address = 0; address < objectCode.length; ++ address)
                         machineState().setMemoryByte(address, objectCode[ address ]);
            
-                code_display_object = this.new code_display();
+
+                code_display_object = new code_display(myMachineStepper);
                 code_display_object.display_code_in_human_readable_format();}
 
         }
@@ -248,84 +247,6 @@ public class guiController
                 }
                 }
         
-        // nested class
-        public class code_display{
 
-            //ctor 
-            public code_display(){
-
-            }
-
-            public void display_code_in_memory_bytes_format(){
-
-                DebugFrame.memory_display_two.setText("");
-                int programCounter = 0;
-                int instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
-                Instruction raw_instruction = machineStepper().get_raw_instruction(programCounter);
-
-                while (true){
-
-                    if (instruction_length_in_bytes == 1){
-
-                    byte data = DebugFrame.memoryBytePrinterObject.get_data(programCounter);
-                    DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x\n", programCounter, data));
-
-                    } else {
-
-                    byte data1 = DebugFrame.memoryBytePrinterObject.get_data(programCounter);
-                    byte data2 = DebugFrame.memoryBytePrinterObject.get_data(programCounter + 1);
-                    DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x %02x\n", programCounter,data1,data2));
-
-                    }
-                    if (raw_instruction.symbolicOpcode() == "STOP")break;
-                    programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
-                    instruction_length_in_bytes);
-                    instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
-                    raw_instruction = machineStepper().get_raw_instruction(programCounter);
-
-                }
-            }
-
-            public void display_code_in_human_readable_format(){
-
-                display_code_in_memory_bytes_format();
-                DebugFrame.input_code_area.setText("");
-
-                int programCounter = 0;
-                String instruction = machineStepper().next_instruction(true, programCounter);
-                Instruction raw_instruction = machineStepper().get_raw_instruction(programCounter);
-                int instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
-
-                DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
-
-                // need to deal with LOAD null which is for variable declaration values
-                while (raw_instruction.symbolicOpcode() != "STOP"){
-
-                programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
-                instruction_length_in_bytes);
-                instruction_length_in_bytes = machineStepper().get_instruction_bytes_length(programCounter);
-                instruction = machineStepper().next_instruction(true, programCounter);
-                raw_instruction = machineStepper().get_raw_instruction(programCounter);
-
-                String tmp_instruction; 
-                if (instruction.endsWith("LOAD null")){
-
-                    byte [ ] dataBytes = machineStepper().fetchMemoryBytes(programCounter, 2);
-                    int data = ((short) (dataBytes[ 0 ] << 8 | dataBytes[ 1 ] & 0xff));
-                    tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
-
-                } 
-                else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
-                    tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + instruction;
-                } else {
-                    tmp_instruction = instruction;
-                }
-
-                DebugFrame.input_code_area.append(programCounter + "    " + tmp_instruction + "\n");
-                //DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
-
-                }
-            }
-        }
     }
 

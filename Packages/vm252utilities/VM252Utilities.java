@@ -3,13 +3,10 @@ package vm252utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 
-import javax.sound.midi.SysexMessage;
 
 
 public class VM252Utilities
