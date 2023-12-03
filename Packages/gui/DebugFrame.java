@@ -17,6 +17,10 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
+
+import vm252architecturespecifications.VM252ArchitectureSpecifications;
+import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
+
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -25,7 +29,9 @@ import javax.swing.*;
 import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
+import vm252simulation.VM252Stepper;
 import vm252simulation.VM252View;
+import vm252utilities.VM252Utilities;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,60 +46,182 @@ import java.awt.event.MouseAdapter;
  * @author : Abigail Wood, Sabina Dahal, and Supreme Paudel
  */
 
+        // nested class
+class code_display{
+
+    //ctor 
+    public VM252Stepper myStepper;
+    public String typeOfDisplay = "bytes";
+
+    public code_display(VM252Stepper stepper){
+            myStepper = stepper;
+            }
+
+    public void display_entire_memory(){
+        // type can be as machine memory as bytes in hex
+        // or 2byte data in hex
+        // type will be either "two-byte" or "bytes"
+        
+        DebugFrame.memory_display_one.setText("");
+        for (int address = 0; address < VM252ArchitectureSpecifications.MEMORY_SIZE_IN_BYTES; address ++){
+
+            byte data = DebugFrame.memoryBytePrinterObject.get_data(address);
+            if (address % 20 == 0) {
+                if (typeOfDisplay == "bytes"){
+                DebugFrame.memory_display_one.append(String.format("[Addr %d] %02x", address, data));
+                } else  DebugFrame.memory_display_one.append(String.format("[Addr %d] %02x", address, data));
+            }
+            else if (address % 20 == 19) {
+                if (typeOfDisplay == "bytes"){
+                DebugFrame.memory_display_one.append(String.format(" %02x\n", data));
+                } else DebugFrame.memory_display_one.append(String.format("%02x\n", data));
+            }
+            else  {
+                if (typeOfDisplay == "bytes" || address % 2 == 0){
+                DebugFrame.memory_display_one.append(String.format(" %02x", data));
+                } else
+                DebugFrame.memory_display_one.append(String.format("%02x", data));
+            }
+    }
+
+    DebugFrame.memory_display_one.setCaretPosition(0);
+}
+    public void display_code_in_memory_bytes_format(){
+
+        DebugFrame.memory_display_two.setText("");
+        int programCounter = 0;
+        int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+
+        while (programCounter < VM252Utilities.byteContentMapSize){
+
+            if (instruction_length_in_bytes == 1){
+
+            byte data = DebugFrame.memoryBytePrinterObject.get_data(programCounter);
+            DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x\n", programCounter, data));
+
+            } else {
+
+            byte data1 = DebugFrame.memoryBytePrinterObject.get_data(programCounter);
+            byte data2 = DebugFrame.memoryBytePrinterObject.get_data(programCounter + 1);
+            DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x %02x\n", programCounter,data1,data2));
+
+            }
+
+            programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
+            instruction_length_in_bytes);
+            instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+            }
+            }
+
+    public void display_code_in_human_readable_format(){
+
+            display_code_in_memory_bytes_format();
+            display_entire_memory();
+            DebugFrame.input_code_area.setText("");
+
+            int programCounter = 0;
+            String instruction = myStepper.next_instruction(programCounter);
+            Instruction raw_instruction = myStepper.get_raw_instruction(programCounter);
+            int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+
+            while (programCounter < VM252Utilities.byteContentMapSize){
+
+            String tmp_instruction; 
+
+            // this will be code of the type variableName : someNumber (e.g value : 5)
+            if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null && VM252Utilities.addressesWhichHoldsObjectCodeData.contains(programCounter)){ 
+
+                byte [ ] dataBytes = myStepper.fetchMemoryBytes(programCounter, 2);
+                int data = ((short) (dataBytes[ 0 ] << 8 | dataBytes[ 1 ] & 0xff));
+                tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
+
+            // this will be code of the type variableName : instruction (e.g main : input)
+            }else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
+                tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + instruction;
+
+            // this will be code of the type instruction (e.g STOP, JUMP main)
+            } else {
+                tmp_instruction = instruction;
+            }
+
+                DebugFrame.input_code_area.append(programCounter + "    " + tmp_instruction + "\n");
+
+                programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
+                instruction_length_in_bytes);
+
+                instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+                instruction = myStepper.next_instruction(programCounter);
+                raw_instruction = myStepper.get_raw_instruction(programCounter);
+
+                }
+            }
+        }
+
 class lineHighlightPrinter{
 
     private final VM252Model myModel;
-    private final JTextArea myTextArea;
-    private int currentLine;
-    private Object currentHighlighter;
+    private final JTextArea myTextArea1;
+    private final JTextArea myTextArea2;
+    private int currentLine1;
+    private int currentLine2;
+    private Object currentHighlighter1;
+    private Object currentHighlighter2;
 
-    public int getCurrentLine(int pc_value){
+    public int getCurrentLine(int pc_value, JTextArea textArea){
         int line_number = 0;
-        String [] list_of_lines =myTextArea.getText().split("\n");
+        String [] list_of_lines =textArea.getText().split("\n");
         for (String line: list_of_lines){
-            if (line.startsWith(""+pc_value)){
+            if (textArea.equals(myTextArea1) && line.startsWith(""+pc_value)){
+                    break;
+                }
+            else if (textArea.equals(myTextArea2) && line.startsWith("[Addr "+pc_value)){
                 break;
             }
             line_number++;
         }
-        currentLine = line_number;
-        return currentLine;
-    }
+        return line_number;
+        }
 
     public void updateHighlighter(){
 
         try {
         int pc = myModel.programCounter();
-        currentLine = getCurrentLine(pc);
-        Highlighter high = myTextArea.getHighlighter();
+        currentLine1 = getCurrentLine(pc, myTextArea1);
+        currentLine2 = getCurrentLine(pc, myTextArea2);
+        Highlighter high1 = myTextArea1.getHighlighter();
+        Highlighter high2 = myTextArea2.getHighlighter();
 
         try {
-        high.removeHighlight(currentHighlighter);}
+        high1.removeHighlight(currentHighlighter1);
+        high2.removeHighlight(currentHighlighter2);
+    }
         catch (NullPointerException e){
             System.out.println(e);
         }
 
-        int start = myTextArea.getLineStartOffset(currentLine);
-        int end   = myTextArea.getLineEndOffset(currentLine);
-        currentHighlighter = high.addHighlight(start,end,new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
-        }
+        int start1 = myTextArea1.getLineStartOffset(currentLine1);
+        int end1   = myTextArea1.getLineEndOffset(currentLine1);
+
+        int start2 = myTextArea2.getLineStartOffset(currentLine2);
+        int end2   = myTextArea2.getLineEndOffset(currentLine2);
+
+        currentHighlighter1 = high1.addHighlight(start1,end1,new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+        currentHighlighter2 = high2.addHighlight(start2,end2,new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+    }
 
         catch (BadLocationException e) {
             }
         }
     
-    public lineHighlightPrinter(VM252Model model, JTextArea textArea)
+    public lineHighlightPrinter(VM252Model model, JTextArea textArea1, JTextArea textArea2)
     {       
         myModel = model;       
-        myTextArea = textArea;
-        currentLine = 1;
+        myTextArea1 = textArea1;
+        myTextArea2 = textArea2;
+        currentLine1 = 1;
+        currentLine2 = 1;
         }
    
-    public void setCurrentLine(int value){
-        currentLine = value;
-    
-    }
-
         }
 
 class accumulatorPrinter extends VM252View {
@@ -163,6 +291,10 @@ class MemoryBytePrinter extends VM252View
         DebugFrame.memory_display_two.append(formattedString);       
 
         }
+    
+    public byte get_data(int address){
+        return myModel.memoryByte(address);
+    }
 
     }
 
@@ -212,6 +344,7 @@ public class DebugFrame extends javax.swing.JFrame {
     String objFileName = "";
     static guiController simulator;
     static accumulatorPrinter accumulatorPrinterObject;
+    static code_display code_display_object;
     static lineHighlightPrinter lineHighlightPrinterObject;
     static ProgramCounterPrinter programCounterPrinterObject;
     static StopAnnouncer stopAnnouncerObject;
@@ -219,11 +352,9 @@ public class DebugFrame extends javax.swing.JFrame {
     static String instruction_to_be_executed;
     static JButton button_clicked;
     public static VM252Model simulatedMachine;
-    private Set<Integer> breakpoints;
+    static Set<Integer> breakpoints;
     private Map<Integer, Object> memoryDisplayHighlightTags;
     private Map<Integer, Object> inputCodeAreaHighlightTags;
-   
-       
        
     public static Double getRunSpeedFromSpeedComponent(){
 
@@ -620,6 +751,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         memory_display_two.setEditable(false);
         memory_display_two.setColumns(20);
+        memory_display_two.setFont(new java.awt.Font("Segoe UI", 0, 20)); // NOI18N
         memory_display_two.setRows(5);
         memory_display_scroll_two.setViewportView(memory_display_two);
 
@@ -704,7 +836,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
         Center_Bottom_East.setBackground(new java.awt.Color(153, 153, 153));
 
-        memory_options_one.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Object code as bytes in Hex", "Object code as 2 byte data in Hex", "Object code as instructions-data and labels", "Edit" }));
+        memory_options_one.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Machine memory as bytes in Hex", "Machine memory as 2 byte data in Hex", "Edit" }));
         memory_options_one.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 memory_options_oneActionPerformed(evt);
@@ -793,6 +925,17 @@ public class DebugFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_file_SelectedActionPerformed
 
     private void memory_options_oneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memory_options_oneActionPerformed
+
+            String line = (String) memory_options_one.getSelectedItem();
+            if (line.contains("2 byte data")){
+                // 2 byte data
+                code_display_object.typeOfDisplay = "two-byte";
+                code_display_object.display_entire_memory();
+            } else {
+                // as bytes
+                code_display_object.typeOfDisplay = "bytes";
+                code_display_object.display_entire_memory();
+            }
         // TODO add your handling code here:
     }//GEN-LAST:event_memory_options_oneActionPerformed
 
@@ -860,7 +1003,7 @@ public class DebugFrame extends javax.swing.JFrame {
     programCounterPrinterObject = new ProgramCounterPrinter(simulatedMachine);
     stopAnnouncerObject = new StopAnnouncer(simulatedMachine);
     memoryBytePrinterObject = new MemoryBytePrinter(simulatedMachine);
-    lineHighlightPrinterObject = new lineHighlightPrinter(simulatedMachine, DebugFrame.input_code_area);
+    lineHighlightPrinterObject = new lineHighlightPrinter(simulatedMachine, DebugFrame.input_code_area, DebugFrame.memory_display_two);
 
     simulatedMachine.attach(accumulatorPrinterObject);
     simulatedMachine.attach(programCounterPrinterObject);
@@ -871,10 +1014,13 @@ public class DebugFrame extends javax.swing.JFrame {
 
     simulator = new guiController(simulatedMachine, lineHighlightPrinterObject);
     simulator.loadFile(objFileName, new Scanner(System.in), System.out);
-    lineHighlightPrinterObject.updateHighlighter();
+    code_display_object = new code_display(simulator.machineStepper());
 
+    simulator.setCodeDisplayObject(code_display_object);
+    code_display_object.display_code_in_human_readable_format();
+    lineHighlightPrinterObject.updateHighlighter();
     // also put the first instruction
-    instruction_Display.setText(simulator.machineStepper().next_instruction(true, 0));
+    instruction_Display.setText(simulator.machineStepper().next_instruction(0));
     }
         
 
@@ -989,7 +1135,7 @@ private void addHighlightToLine(JTextArea textArea, int line) {
 
 
 
-private void removeHighlightFromLine(JTextArea textArea, int line) {
+    private void removeHighlightFromLine(JTextArea textArea, int line) {
     Highlighter highlighter = textArea.getHighlighter();
     // Determine which highlight tag map to use based on the JTextArea
     // If the JTextArea is memory_display_two, use memoryDisplayHighlightTags
