@@ -432,6 +432,8 @@ public class DebugFrame extends javax.swing.JFrame {
         Middle_East = new javax.swing.JPanel();
         next_Instruction = new javax.swing.JLabel();
         instruction_Display = new javax.swing.JTextField();
+        break_Clear = new javax.swing.JButton();
+        edit_Memorybyte = new javax.swing.JButton();
         Bottom_West = new javax.swing.JPanel();
         input_code_scroll = new javax.swing.JScrollPane();
         input_code_area = new javax.swing.JTextArea();
@@ -723,12 +725,30 @@ public class DebugFrame extends javax.swing.JFrame {
                 .addGap(37, 37, 37))
         );
 
+        break_Clear.setText("Clear Breakpounts");
+        break_Clear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt){
+                break_ClearActionPerformed(evt);
+            }
+        });
+
+        edit_Memorybyte.setText("Edit Memory");
+        edit_Memorybyte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt){
+                edit_MemorybyteActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout Middle_PanelLayout = new javax.swing.GroupLayout(Middle_Panel);
         Middle_Panel.setLayout(Middle_PanelLayout);
         Middle_PanelLayout.setHorizontalGroup(
             Middle_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(Middle_PanelLayout.createSequentialGroup()
-                .addContainerGap(253, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(break_Clear)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(edit_Memorybyte)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 90, Short.MAX_VALUE)
                 .addComponent(Middle_Center, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(100, 100, 100)
                 .addComponent(Middle_West, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -741,6 +761,11 @@ public class DebugFrame extends javax.swing.JFrame {
             .addComponent(Middle_West, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
             .addComponent(Middle_East, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(Middle_Center, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, Middle_PanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(Middle_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(break_Clear)
+                    .addComponent(edit_Memorybyte)))
         );
 
         input_code_area.setColumns(20);
@@ -994,6 +1019,14 @@ public class DebugFrame extends javax.swing.JFrame {
         String new_value = accumulator_display.getText();
         accumulatorPrinterObject.setAccumulator(Integer.parseInt(new_value));
         DebugFrame.event_display.setText(DebugFrame.event_display.getText()+ "ACC set to " + Integer.parseInt(new_value)+ "\n");
+    }
+
+    private void break_ClearActionPerformed(java.awt.event.ActionEvent evt) {                                            
+        // TODO add your handling code here:
+    }                                           
+
+    private void edit_MemorybyteActionPerformed(java.awt.event.ActionEvent evt) {                                                
+        // TODO add your handling code here:
     }
     
     private void create_simulation_machine() throws IOException{
@@ -1306,7 +1339,9 @@ private void synchronizeHighlights(int line) {
     private javax.swing.JLabel accumulator;
     public static javax.swing.JTextField accumulator_display;
     private static javax.swing.JComboBox<String> adjust_Speed;
+    private javax.swing.JButton break_Clear;
     public static javax.swing.JTextField count_diplay;
+    private javax.swing.JButton edit_Memorybyte;
     public static javax.swing.JTextArea output_text;
     private javax.swing.JButton executeAgain;
     private javax.swing.JTextField file_Selected;
