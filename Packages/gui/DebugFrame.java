@@ -144,13 +144,11 @@ class breakpointHandler{
 
             int index = breakpoints.indexOf(line);
             breakpoints.remove(index);
-            breakpoints.remove(index);
             programCounterBreakpoints.remove(index);
             
         } else {
 
-           int programCounterValue = get_program_counter_value(line);
-            System.out.println(programCounterValue);
+            int programCounterValue = get_program_counter_value(line);
             breakpoints.add(line);
             programCounterBreakpoints.add(programCounterValue);
 
