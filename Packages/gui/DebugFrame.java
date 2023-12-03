@@ -143,7 +143,8 @@ class breakpointHandler{
         if (breakpoints.contains(line)) {
 
             int index = breakpoints.indexOf(line);
-            breakpoints.remove(line);
+            breakpoints.remove(index);
+            breakpoints.remove(index);
             programCounterBreakpoints.remove(index);
             
         } else {
@@ -383,6 +384,23 @@ class code_display{
             }
 
     public void display_code_in_human_readable_format(){
+
+            // The idea for displaying code in human-readable format is to fetch memory bytes one after another,
+            // and converting them to instructions
+
+            // If the instruction only consists of just the symbolic opcode such as STOP, INPUT, (instructions with a single word),
+            // we will just display their symbolic code
+
+            // If the memory address we are fetching is object code that holds data, then we display what the variable name is and the data the address is storing
+            // which consists of 2 bytes of data
+            // The variable name is found with the help of VM252Utilities.addressesWhichHoldsObjectCodeData which is a hash map with address(PC) values as hash keys, and
+            // the variable name designated for that address as the values
+
+            // If the memory address we are fetching holds executable code but belongs to the VM252Utilities.addressesWhichHoldsObjectCodeData hash map
+            // , this means this is of the type (variableName : INSTRUCTION) e.g main: INPUT
+            // These are just instructions that are involved in jump statements/ while loops used to jump the PC to a certain PC value
+            // (example JUMP main) will change(jump) to wherever main is( wherever the memory address of main is)
+
 
             display_code_in_memory_bytes_format();
             display_entire_memory();
