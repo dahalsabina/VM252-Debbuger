@@ -6,6 +6,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Set;
+import java.util.concurrent.BrokenBarrierException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -46,7 +47,171 @@ import java.awt.event.MouseAdapter;
  * @author : Abigail Wood, Sabina Dahal, and Supreme Paudel
  */
 
-        // nested class
+// Class to handle breakpoint display and store breakpoint line values
+class breakpointHandler{
+
+    private JTextArea memory_display_two;
+    private JTextArea input_code_area;
+    static Set<Integer> breakpoints;
+    private Map<Integer, Object> memoryDisplayHighlightTags;
+    private Map<Integer, Object> inputCodeAreaHighlightTags;
+
+    public breakpointHandler(JTextArea display_1, JTextArea display_2) {
+        input_code_area = display_1;
+        memory_display_two = display_2;
+
+        setupMouseListener();
+        setupInputCodeAreaMouseListener();
+        breakpoints = new HashSet<>();
+        memoryDisplayHighlightTags = new HashMap<>();
+        inputCodeAreaHighlightTags = new HashMap<>();
+    }
+
+    // Method to set up a mouse listener on the JTextArea 'memory_display_two'
+    public void setupMouseListener() {
+
+    memory_display_two.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                Triple<Integer, Integer, Integer> lineInfo = determineClickedLineLocation(
+                    memory_display_two, e.getX(), e.getY()
+                );
+                int line = lineInfo.first;
+                toggleBreakpointAtLine(line); 
+                synchronizeHighlights(line);
+            }
+        }
+    });
+}
+// Method to set up a mouse listener on the JTextArea 'input_code_area'
+    public void setupInputCodeAreaMouseListener() {
+    input_code_area.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                Triple<Integer, Integer, Integer> lineInfo = determineClickedLineLocation(
+                    input_code_area, e.getX(), e.getY()
+                );
+                int line = lineInfo.first;
+                toggleBreakpointAtLine(line); // Updated to pass only line number
+                synchronizeHighlights(line);
+            }
+        }
+    });
+}
+
+
+    // Method to determine the clicked line location in the JTextArea
+    public Triple<Integer, Integer, Integer> determineClickedLineLocation(
+    JTextArea textAreaClicked, int xCoordinateOfClick, int yCoordinateOfClick) {
+
+    int textPosition = textAreaClicked.viewToModel(new Point(xCoordinateOfClick, yCoordinateOfClick));
+    Document document = textAreaClicked.getDocument();
+    Element paragraphElement = ((AbstractDocument)document).getParagraphElement(textPosition);
+    int startingOffsetOfLine = paragraphElement.getStartOffset();
+    int endingOffsetOfLine = paragraphElement.getEndOffset();
+    int lineNumber = 0;
+    try {
+        lineNumber = textAreaClicked.getLineOfOffset(startingOffsetOfLine);
+    } catch (BadLocationException e) {
+        e.printStackTrace();
+    }
+    return new Triple<>(lineNumber, startingOffsetOfLine, endingOffsetOfLine);
+}
+
+// Method to toggle a breakpoint on a specific line
+
+    private void toggleBreakpointAtLine(int line) {
+
+        if (breakpoints.contains(line)) {
+            breakpoints.remove(line);
+        } else {
+            breakpoints.add(line);
+        }
+        synchronizeHighlights(line);
+    }
+
+
+    private void addHighlightToLine(JTextArea textArea, int line) {
+        try {
+        // Determine which map of highlight tags to use based on the JTextArea
+        // If the JTextArea is memory_display_two, use memoryDisplayHighlightTags
+        // If the JTextArea is input_code_area, use inputCodeAreaHighlightTags
+            Object existingTag = textArea == memory_display_two ? 
+                memoryDisplayHighlightTags.get(line) : inputCodeAreaHighlightTags.get(line);
+        // Check if a highlight already exists for this line
+        // Only proceed if there is no existing highlight for this line
+            if (existingTag == null) {
+            // No existing highlight, so add a new one
+            // Determine the start and end offsets for the line in the JTextArea
+                int startOffset = textArea.getLineStartOffset(line);
+                int endOffset = textArea.getLineEndOffset(line);
+                HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
+                Highlighter highlighter = textArea.getHighlighter();
+                Object tag = highlighter.addHighlight(startOffset, endOffset, painter);
+
+            // Store the highlight tag in the appropriate map 
+            
+                if (textArea == memory_display_two) {
+                    memoryDisplayHighlightTags.put(line, tag);
+                } else if (textArea == input_code_area) {
+                    inputCodeAreaHighlightTags.put(line, tag);
+                }
+            }
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+}
+
+
+
+        private void removeHighlightFromLine(JTextArea textArea, int line) {
+            Highlighter highlighter = textArea.getHighlighter();
+    // Determine which highlight tag map to use based on the JTextArea
+    // If the JTextArea is memory_display_two, use memoryDisplayHighlightTags
+    // If the JTextArea is input_code_area, use inputCodeAreaHighlightTags
+            Object tag = textArea == memory_display_two ? 
+                memoryDisplayHighlightTags.get(line) : inputCodeAreaHighlightTags.get(line);
+
+            if (tag != null) {
+        // If a tag is found, remove the highlight associated with this tag
+        // from the JTextArea using the Highlighter
+                highlighter.removeHighlight(tag);
+        // Also remove the tag from the appropriate highlight tag map
+                if (textArea == memory_display_two) {
+                memoryDisplayHighlightTags.remove(line);
+            } else if (textArea == input_code_area) {
+                inputCodeAreaHighlightTags.remove(line);
+            }
+            } else {
+                System.out.println("No highlight tag found for line: " + line);
+        }
+        }
+
+
+        private void synchronizeHighlights(int line) {
+    // Check if the specified line is contained within the breakpoints set
+            if (breakpoints.contains(line)) {
+        // If the line is a breakpoint, add a highlight to that line
+        // in both JTextAreas (memory_display_two and input_code_area)
+            addHighlightToLine(memory_display_two, line);
+            addHighlightToLine(input_code_area, line);
+            } else {
+            // If the line is not a breakpoint (i.e., if the breakpoint has been removed),
+            // then remove the highlight from that line in both JTextAreas
+
+            removeHighlightFromLine(memory_display_two, line);
+            removeHighlightFromLine(input_code_area, line);
+            }
+}
+
+        private void processBreakpoints() {
+            // Process the breakpoints as needed, e.g., update the simulator
+                
+            }
+}
+
 class code_display{
 
     //ctor 
@@ -352,9 +517,6 @@ public class DebugFrame extends javax.swing.JFrame {
     static String instruction_to_be_executed;
     static JButton button_clicked;
     public static VM252Model simulatedMachine;
-    static Set<Integer> breakpoints;
-    private Map<Integer, Object> memoryDisplayHighlightTags;
-    private Map<Integer, Object> inputCodeAreaHighlightTags;
        
     public static Double getRunSpeedFromSpeedComponent(){
 
@@ -537,12 +699,7 @@ public class DebugFrame extends javax.swing.JFrame {
             }
         });
 
-        setupMouseListener();
-        setupInputCodeAreaMouseListener();
-        breakpoints = new HashSet<>();
-        memoryDisplayHighlightTags = new HashMap<>();
-        inputCodeAreaHighlightTags = new HashMap<>();
-       
+      
         adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] {"Speed ∞", "Speed x1.0", "Speed x0.75", "Speed x0.5", "Speed x0.25"}));
         
         javax.swing.GroupLayout Button_PanelLayout = new javax.swing.GroupLayout(Button_Panel);
@@ -848,6 +1005,8 @@ public class DebugFrame extends javax.swing.JFrame {
         memory_display_one.setRows(5);
         memory_display_scroll_one.setViewportView(memory_display_one);
 
+        breakpointHandler breakpointHandlerObject = new breakpointHandler(memory_display_two, input_code_area);
+        
         javax.swing.GroupLayout Center_Bottom_EastLayout = new javax.swing.GroupLayout(Center_Bottom_East);
         Center_Bottom_East.setLayout(Center_Bottom_EastLayout);
         Center_Bottom_EastLayout.setHorizontalGroup(
@@ -1025,164 +1184,11 @@ public class DebugFrame extends javax.swing.JFrame {
         
 
 
-public class Triple<T, U, V> {
-    public final T first;  
-    public final U second; 
-    public final V third;  
-
-    
-    public Triple(T first, U second, V third) {
-        this.first = first;
-        this.second = second;
-        this.third = third;
-    }
-}
-
-// Method to set up a mouse listener on the JTextArea 'memory_display_two'
-public void setupMouseListener() {
-    memory_display_two.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (e.getClickCount() == 2) {
-                Triple<Integer, Integer, Integer> lineInfo = determineClickedLineLocation(
-                    memory_display_two, e.getX(), e.getY()
-                );
-                int line = lineInfo.first;
-                toggleBreakpointAtLine(line); 
-                synchronizeHighlights(line);
-            }
-        }
-    });
-}
-// Method to set up a mouse listener on the JTextArea 'input_code_area'
-public void setupInputCodeAreaMouseListener() {
-    input_code_area.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            if (e.getClickCount() == 2) {
-                Triple<Integer, Integer, Integer> lineInfo = determineClickedLineLocation(
-                    input_code_area, e.getX(), e.getY()
-                );
-                int line = lineInfo.first;
-                toggleBreakpointAtLine(line); // Updated to pass only line number
-                synchronizeHighlights(line);
-            }
-        }
-    });
-}
-
-
-// Method to determine the clicked line location in the JTextArea
-Triple<Integer, Integer, Integer> determineClickedLineLocation(
-    JTextArea textAreaClicked, int xCoordinateOfClick, int yCoordinateOfClick) {
-
-    int textPosition = textAreaClicked.viewToModel(new Point(xCoordinateOfClick, yCoordinateOfClick));
-    Document document = textAreaClicked.getDocument();
-    Element paragraphElement = ((AbstractDocument)document).getParagraphElement(textPosition);
-    int startingOffsetOfLine = paragraphElement.getStartOffset();
-    int endingOffsetOfLine = paragraphElement.getEndOffset();
-    int lineNumber = 0;
-    try {
-        lineNumber = textAreaClicked.getLineOfOffset(startingOffsetOfLine);
-    } catch (BadLocationException e) {
-        e.printStackTrace();
-    }
-    return new Triple<>(lineNumber, startingOffsetOfLine, endingOffsetOfLine);
-}
-
-// Method to toggle a breakpoint on a specific line
-
-private void toggleBreakpointAtLine(int line) {
-    if (breakpoints.contains(line)) {
-        breakpoints.remove(line);
-    } else {
-        breakpoints.add(line);
-    }
-    synchronizeHighlights(line);
-}
-
-
-private void addHighlightToLine(JTextArea textArea, int line) {
-    try {
-        // Determine which map of highlight tags to use based on the JTextArea
-        // If the JTextArea is memory_display_two, use memoryDisplayHighlightTags
-        // If the JTextArea is input_code_area, use inputCodeAreaHighlightTags
-        Object existingTag = textArea == memory_display_two ? 
-            memoryDisplayHighlightTags.get(line) : inputCodeAreaHighlightTags.get(line);
-        // Check if a highlight already exists for this line
-        // Only proceed if there is no existing highlight for this line
-        if (existingTag == null) {
-            // No existing highlight, so add a new one
-            // Determine the start and end offsets for the line in the JTextArea
-            int startOffset = textArea.getLineStartOffset(line);
-            int endOffset = textArea.getLineEndOffset(line);
-            HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
-            Highlighter highlighter = textArea.getHighlighter();
-            Object tag = highlighter.addHighlight(startOffset, endOffset, painter);
-
-            // Store the highlight tag in the appropriate map 
-            
-            if (textArea == memory_display_two) {
-                memoryDisplayHighlightTags.put(line, tag);
-            } else if (textArea == input_code_area) {
-                inputCodeAreaHighlightTags.put(line, tag);
-            }
-        }
-    } catch (BadLocationException e) {
-        e.printStackTrace();
-    }
-}
-
-
-
-    private void removeHighlightFromLine(JTextArea textArea, int line) {
-    Highlighter highlighter = textArea.getHighlighter();
-    // Determine which highlight tag map to use based on the JTextArea
-    // If the JTextArea is memory_display_two, use memoryDisplayHighlightTags
-    // If the JTextArea is input_code_area, use inputCodeAreaHighlightTags
-    Object tag = textArea == memory_display_two ? 
-        memoryDisplayHighlightTags.get(line) : inputCodeAreaHighlightTags.get(line);
-
-    if (tag != null) {
-        // If a tag is found, remove the highlight associated with this tag
-        // from the JTextArea using the Highlighter
-        highlighter.removeHighlight(tag);
-        // Also remove the tag from the appropriate highlight tag map
-        if (textArea == memory_display_two) {
-            memoryDisplayHighlightTags.remove(line);
-        } else if (textArea == input_code_area) {
-            inputCodeAreaHighlightTags.remove(line);
-        }
-    } else {
-        System.out.println("No highlight tag found for line: " + line);
-    }
-}
 
 
 
 
 
-private void synchronizeHighlights(int line) {
-    // Check if the specified line is contained within the breakpoints set
-    if (breakpoints.contains(line)) {
-        // If the line is a breakpoint, add a highlight to that line
-        // in both JTextAreas (memory_display_two and input_code_area)
-        addHighlightToLine(memory_display_two, line);
-        addHighlightToLine(input_code_area, line);
-    } else {
-        // If the line is not a breakpoint (i.e., if the breakpoint has been removed),
-        // then remove the highlight from that line in both JTextAreas
-
-        removeHighlightFromLine(memory_display_two, line);
-        removeHighlightFromLine(input_code_area, line);
-    }
-}
-
-            private void processBreakpoints() {
-                // Process the breakpoints as needed, e.g., update the simulator
-                
-                
-            }
    
     private void selectFileActionPerformed(java.awt.event.ActionEvent evt) throws IOException{//GEN-FIRST:event_selectFileActionPerformed
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -1338,4 +1344,17 @@ private void synchronizeHighlights(int line) {
     }
 
 
+}
+
+class Triple<T, U, V> {
+    public final T first;  
+    public final U second; 
+    public final V third;  
+
+    
+    public Triple(T first, U second, V third) {
+        this.first = first;
+        this.second = second;
+        this.third = third;
+    }
 }
