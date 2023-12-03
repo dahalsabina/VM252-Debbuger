@@ -20,6 +20,7 @@ public class guiController
         private VM252Model myMachineState;
         private VM252Stepper myMachineStepper;
         private lineHighlightPrinter myLineHighlightPrinterObject;
+        private breakpointHandler myBreakpointHandlerObject;
         private boolean simulation_started;
         private boolean simulation_paused;
         public gui.code_display code_display_object;
@@ -33,6 +34,11 @@ public class guiController
         public lineHighlightPrinter lineHighlighPrinterObject(){
             return myLineHighlightPrinterObject;
         }
+
+        public breakpointHandler breakpointHandlerObject(){
+            return myBreakpointHandlerObject; 
+        }
+
         public VM252Model machineState()
         {
 
@@ -82,12 +88,13 @@ public class guiController
     // Public Ctors
     //
 
-        public guiController(VM252Model simulatedMachine, lineHighlightPrinter lineHighlightPrinterObject)
+        public guiController(VM252Model simulatedMachine, lineHighlightPrinter lineHighlightPrinterObject, breakpointHandler breakpointHandlerObject)
         {
             this.simulation_started = false;
             this.simulation_paused = false;
             setMachineState(simulatedMachine);
             myLineHighlightPrinterObject = lineHighlightPrinterObject;
+            myBreakpointHandlerObject = breakpointHandlerObject;
             myRunSpeed = DebugFrame.getRunSpeedFromSpeedComponent();
             create_timer();
 
@@ -185,6 +192,7 @@ public class guiController
                                     code_display_object.display_code_in_human_readable_format();
                                     display_instruction();
                                     lineHighlighPrinterObject().updateHighlighter();
+                                    breakpointHandlerObject().addHighlightsBack();
                                 }
                                     else stop_timer();}
                     });
@@ -217,6 +225,7 @@ public class guiController
                     do_next_instruction();
                     display_instruction();
                     lineHighlighPrinterObject().updateHighlighter();
+                    breakpointHandlerObject().addHighlightsBack();
                 }
 
                 }
@@ -228,6 +237,7 @@ public class guiController
                     do_next_instruction();
                     display_instruction();
                     lineHighlighPrinterObject().updateHighlighter();
+                    breakpointHandlerObject().addHighlightsBack();
                 }
                 }}
 
