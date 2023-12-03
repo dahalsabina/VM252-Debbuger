@@ -6,9 +6,11 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
+import vm252architecturespecifications.VM252ArchitectureSpecifications;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
 import vm252utilities.VM252Utilities;
@@ -171,6 +173,11 @@ public class guiController
                 for (int address = 0; address < objectCode.length; ++ address)
                         machineState().setMemoryByte(address, objectCode[ address ]);
             }
+                Random number_generator = new Random();
+                for (int address = objectCode.length; address < VM252ArchitectureSpecifications.MEMORY_SIZE_IN_BYTES; ++address){
+                        machineState().setMemoryByte(address, (byte) number_generator.nextInt(256));
+                }
+
 
 
         }
