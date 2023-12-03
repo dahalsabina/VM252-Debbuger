@@ -159,6 +159,11 @@ class breakpointHandler{
     }
 
 
+    public void remove_breakpoint(int index){
+        programCounterBreakpoints.remove(index);
+        breakpoints.remove(index);
+    }
+
     public int get_program_counter_value(int line){
 
             // find pc value using regex
@@ -275,10 +280,21 @@ class breakpointHandler{
             }
 }
 
-        private void processBreakpoints() {
-            // Process the breakpoints as needed, e.g., update the simulator
+        public void processBreakpoints(int address) {
+            // Process the breakpoints as needed,
+                int index = programCounterBreakpoints.indexOf(address);
+                // remove breakpoint
+                remove_breakpoint(index);
+                // update event display
+                DebugFrame.event_display.append("Breakpoint hit at address " + address+ "\n");
                 
             }
+
+        public void clearAllBreakpoints(){
+
+            // TO DO : SABINA
+
+       }
 
         public void reset_variables() {
 

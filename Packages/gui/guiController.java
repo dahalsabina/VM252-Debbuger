@@ -259,9 +259,14 @@ public class guiController
         
 
         public void check_if_breakpoints_hit(){
-            ArrayList<Integer> breakpoints =  breakpointHandlerObject().breakpoints;
-            // check if any breakpoints have been and it they have been hut pause the program,
-            // remove the breakpoint
+            ArrayList<Integer> programCounterBreakpoints =  breakpointHandlerObject().programCounterBreakpoints;
+            // check if any breakpoints have been 
+            if (programCounterBreakpoints.contains(machineState().programCounter())){
+                // pause the simulator
+                machineState().setStoppedStatus(VM252Model.StoppedCategory.paused);
+                // remove breakpoint and update event display
+                breakpointHandlerObject().processBreakpoints(machineState().programCounter());
+            }
         }
     }
 
