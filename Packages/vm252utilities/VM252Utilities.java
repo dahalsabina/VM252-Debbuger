@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 
@@ -12,6 +14,8 @@ import java.util.HashMap;
 public class VM252Utilities
 {
     public static HashMap<Integer, String> addressSymbolHashMap = new HashMap<Integer, String>();
+    public static int byteContentMapSize;
+    public static ArrayList<Integer> addressesWhichHoldsObjectCodeData = new ArrayList<>();
 
     //
     // Public Class Methods
@@ -47,6 +51,7 @@ public class VM252Utilities
         {
 
             addressSymbolHashMap.clear();
+            addressesWhichHoldsObjectCodeData.clear();
             byte [] objectCode = null;
 
             try {
@@ -155,7 +160,7 @@ public class VM252Utilities
                         if (byte0 == -1 || byte1 == -1 || byte2 == -1 || byte3 == -1)
                             throw new IOException();
 
-                        final int byteContentMapSize
+                        byteContentMapSize
                             = (byte3 & 0xff) << 24 | (byte2 & 0xff) << 16
                                 | (byte1 & 0xff) << 8 | byte0 & 0xff;
 
@@ -261,6 +266,14 @@ public class VM252Utilities
 
                         byteContentMap = new byte[ byteContentMapSize ];
 
+                        for (int counter = 0; counter < byteContentMap.length ; counter++){
+                                byte read_value = (byte) objectFile.read();
+                                byteContentMap[counter] = read_value;
+                                
+                                // add the address to the array list if this address is for holding object code data
+                                if (read_value == (byte) 0) addressesWhichHoldsObjectCodeData.add(counter);
+                        }
+
                         int byteContentMapReadStatus = objectFile.read(byteContentMap);
 
                         if (byteContentMapReadStatus == -1)
@@ -281,6 +294,7 @@ public class VM252Utilities
                     }
 
             System.out.println(addressSymbolHashMap);
+            System.out.println(addressesWhichHoldsObjectCodeData);
             return objectCode;
 
             }

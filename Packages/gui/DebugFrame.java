@@ -81,10 +81,9 @@ class code_display{
                 DebugFrame.memory_display_one.append(String.format(" %02x", data));
                 } else
                 DebugFrame.memory_display_one.append(String.format("%02x", data));
-            
-        }
-
+            }
     }
+
     DebugFrame.memory_display_one.setCaretPosition(0);
 }
     public void display_code_in_memory_bytes_format(){
@@ -92,9 +91,8 @@ class code_display{
         DebugFrame.memory_display_two.setText("");
         int programCounter = 0;
         int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
-        Instruction raw_instruction = myStepper.get_raw_instruction(programCounter);
 
-        while (true){
+        while (programCounter < VM252Utilities.byteContentMapSize){
 
             if (instruction_length_in_bytes == 1){
 
@@ -108,53 +106,49 @@ class code_display{
             DebugFrame.memory_display_two.append(String.format("[Addr %d] %02x %02x\n", programCounter,data1,data2));
 
             }
-            if (raw_instruction.symbolicOpcode() == "STOP")break;
+
             programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
             instruction_length_in_bytes);
             instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
-            raw_instruction = myStepper.get_raw_instruction(programCounter);
-
             }
-        }
+            }
 
-            public void display_code_in_human_readable_format(){
+    public void display_code_in_human_readable_format(){
 
-                display_code_in_memory_bytes_format();
-                display_entire_memory();
-                DebugFrame.input_code_area.setText("");
+            display_code_in_memory_bytes_format();
+            display_entire_memory();
+            DebugFrame.input_code_area.setText("");
 
-                int programCounter = 0;
-                String instruction = myStepper.next_instruction(true, programCounter);
-                Instruction raw_instruction = myStepper.get_raw_instruction(programCounter);
-                int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
+            int programCounter = 0;
+            String instruction = myStepper.next_instruction(true, programCounter);
+            Instruction raw_instruction = myStepper.get_raw_instruction(programCounter);
+            int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
 
-                DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
+            // need to deal with LOAD null which is for variable declaration values
+            while (programCounter < VM252Utilities.byteContentMapSize){
 
-                // need to deal with LOAD null which is for variable declaration values
-                while (raw_instruction.symbolicOpcode() != "STOP"){
+            String tmp_instruction; 
+            if (instruction.endsWith("LOAD null")){
+
+                byte [ ] dataBytes = myStepper.fetchMemoryBytes(programCounter, 2);
+                int data = ((short) (dataBytes[ 0 ] << 8 | dataBytes[ 1 ] & 0xff));
+                tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
+
+            } 
+            else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
+                tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + instruction;
+            } else {
+                tmp_instruction = instruction;
+            }
+
+                DebugFrame.input_code_area.append(programCounter + "    " + tmp_instruction + "\n");
 
                 programCounter = VM252ArchitectureSpecifications.nextMemoryAddress(programCounter,
                 instruction_length_in_bytes);
+
                 instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
                 instruction = myStepper.next_instruction(true, programCounter);
                 raw_instruction = myStepper.get_raw_instruction(programCounter);
-
-                String tmp_instruction; 
-                if (instruction.endsWith("LOAD null")){
-
-                    byte [ ] dataBytes = myStepper.fetchMemoryBytes(programCounter, 2);
-                    int data = ((short) (dataBytes[ 0 ] << 8 | dataBytes[ 1 ] & 0xff));
-                    tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
-
-                } 
-                else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
-                    tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + instruction;
-                } else {
-                    tmp_instruction = instruction;
-                }
-
-                DebugFrame.input_code_area.append(programCounter + "    " + tmp_instruction + "\n");
-                //DebugFrame.input_code_area.append(programCounter + "    " + instruction + "\n");
 
                 }
             }
