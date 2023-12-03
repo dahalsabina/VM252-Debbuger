@@ -5,7 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Set;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
@@ -191,6 +193,7 @@ public class guiController
                                     // This will reset the memory_display_2 JTextArea, so need to show highlighter and breakpoints again if any
                                     code_display_object.display_code_in_human_readable_format();
                                     display_instruction();
+                                    check_if_breakpoints_hit();
                                     lineHighlighPrinterObject().updateHighlighter();
                                     breakpointHandlerObject().addHighlightsBack();
                                 }
@@ -223,6 +226,7 @@ public class guiController
 
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
+                    check_if_breakpoints_hit();
                     display_instruction();
                     lineHighlighPrinterObject().updateHighlighter();
                     breakpointHandlerObject().addHighlightsBack();
@@ -235,6 +239,7 @@ public class guiController
                    }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
+                    check_if_breakpoints_hit();
                     display_instruction();
                     lineHighlighPrinterObject().updateHighlighter();
                     breakpointHandlerObject().addHighlightsBack();
@@ -253,5 +258,10 @@ public class guiController
                 }
         
 
+        public void check_if_breakpoints_hit(){
+            ArrayList<Integer> breakpoints =  breakpointHandlerObject().breakpoints;
+            // check if any breakpoints have been and it they have been hut pause the program,
+            // remove the breakpoint
+        }
     }
 

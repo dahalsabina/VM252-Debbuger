@@ -1,4 +1,5 @@
 package gui;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,7 +53,13 @@ class breakpointHandler{
 
     private JTextArea memory_display_two;
     private JTextArea input_code_area;
-    static Set<Integer> breakpoints;
+
+    // The values at the same index in the array list `breakpoints` and `programCounterBreakpoints` are related
+    // E.g If the array list `breakpoints` has 1 in its 0th index and `programCounterBreakpoints` has 2 in its 0th index, 
+    // it means the program counter of our program is 2 when we reach line 1 in our input code
+    public ArrayList<Integer> breakpoints;
+    public ArrayList<Integer> programCounterBreakpoints;
+
     private Map<Integer, Object> memoryDisplayHighlightTags;
     private Map<Integer, Object> inputCodeAreaHighlightTags;
     private MouseAdapter mouseAdapterObjectInputCode;
@@ -64,7 +71,8 @@ class breakpointHandler{
 
         setupMouseListener();
         setupInputCodeAreaMouseListener();
-        breakpoints = new HashSet<>();
+        breakpoints = new ArrayList<>();
+        programCounterBreakpoints = new ArrayList<>();
         memoryDisplayHighlightTags = new HashMap<>();
         inputCodeAreaHighlightTags = new HashMap<>();
     }
@@ -133,14 +141,42 @@ class breakpointHandler{
     private void toggleBreakpointAtLine(int line) {
 
         if (breakpoints.contains(line)) {
+
+            int index = breakpoints.indexOf(line);
             breakpoints.remove(line);
+            programCounterBreakpoints.remove(index);
+            
         } else {
+
+           int programCounterValue = get_program_counter_value(line);
+            System.out.println(programCounterValue);
             breakpoints.add(line);
+            programCounterBreakpoints.add(programCounterValue);
+
         }
         System.out.println(breakpoints + "Are the breakpoints currenrly");
+        System.out.println(programCounterBreakpoints + "Are the program counter where breakpoints are set");
     }
 
 
+    public int get_program_counter_value(int line){
+
+            // find pc value using regex
+            try {
+            int startOffset = input_code_area.getLineStartOffset(line);
+            int endOffset = input_code_area.getLineEndOffset(line);
+ 
+            Pattern pattern = Pattern.compile("([0-9]+).*");
+            Matcher matcher = pattern.matcher(input_code_area.getText(startOffset, endOffset-startOffset));
+            matcher.find();
+            return Integer.parseInt(matcher.group(1));
+
+            } catch (Exception e) {
+            System.out.println(e);
+            return -1;
+            }
+
+    }
     // Once the JTextArea is updated, the highlighters get removed
     // So, after every instruction is executed, it is necessary to set up breakpoint displays 
     // on appropriate lines
@@ -247,6 +283,7 @@ class breakpointHandler{
         public void reset_variables() {
 
             breakpoints.clear();
+            programCounterBreakpoints.clear();
 
             memoryDisplayHighlightTags.clear();
             inputCodeAreaHighlightTags.clear();
