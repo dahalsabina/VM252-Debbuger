@@ -120,23 +120,26 @@ class code_display{
             DebugFrame.input_code_area.setText("");
 
             int programCounter = 0;
-            String instruction = myStepper.next_instruction(true, programCounter);
+            String instruction = myStepper.next_instruction(programCounter);
             Instruction raw_instruction = myStepper.get_raw_instruction(programCounter);
             int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
 
-            // need to deal with LOAD null which is for variable declaration values
             while (programCounter < VM252Utilities.byteContentMapSize){
 
             String tmp_instruction; 
-            if (instruction.endsWith("LOAD null")){
+
+            // this will be code of the type variableName : someNumber (e.g value : 5)
+            if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null && VM252Utilities.addressesWhichHoldsObjectCodeData.contains(programCounter)){ 
 
                 byte [ ] dataBytes = myStepper.fetchMemoryBytes(programCounter, 2);
                 int data = ((short) (dataBytes[ 0 ] << 8 | dataBytes[ 1 ] & 0xff));
                 tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + data;
 
-            } 
-            else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
+            // this will be code of the type variableName : instruction (e.g main : input)
+            }else if (VM252Utilities.addressSymbolHashMap.get(programCounter) != null) {
                 tmp_instruction = VM252Utilities.addressSymbolHashMap.get(programCounter) + ": " + instruction;
+
+            // this will be code of the type instruction (e.g STOP, JUMP main)
             } else {
                 tmp_instruction = instruction;
             }
@@ -147,7 +150,7 @@ class code_display{
                 instruction_length_in_bytes);
 
                 instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
-                instruction = myStepper.next_instruction(true, programCounter);
+                instruction = myStepper.next_instruction(programCounter);
                 raw_instruction = myStepper.get_raw_instruction(programCounter);
 
                 }
@@ -1005,7 +1008,7 @@ public class DebugFrame extends javax.swing.JFrame {
     code_display_object.display_code_in_human_readable_format();
     lineHighlightPrinterObject.updateHighlighter();
     // also put the first instruction
-    instruction_Display.setText(simulator.machineStepper().next_instruction(true, 0));
+    instruction_Display.setText(simulator.machineStepper().next_instruction(0));
     }
         
 

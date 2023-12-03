@@ -139,7 +139,6 @@ public class VM252Stepper
         //
 
         public String next_instruction(
-            boolean specificProgramCounterValue,
             int ProgramCounterValue
         ){
 
@@ -149,34 +148,29 @@ public class VM252Stepper
             int instruction_length;
 
             try {
-                if (!specificProgramCounterValue) memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 2);
-                else memory_bytes_next_instruction = fetchMemoryBytes(ProgramCounterValue, 2);
-                currentInstruction
+                memory_bytes_next_instruction = fetchMemoryBytes(ProgramCounterValue, 2);
+                nextInstruction
                     = new VM252ArchitectureSpecifications.Instruction(
                     memory_bytes_next_instruction
                         );
-                nextInstruction = currentInstruction;
                 instruction_length = 2;
 
             } catch(IllegalArgumentException e) {
-                if (!specificProgramCounterValue) memory_bytes_next_instruction = fetchMemoryBytes(machineState().programCounter(), 1);
-                else memory_bytes_next_instruction = fetchMemoryBytes(ProgramCounterValue, 1);
-                currentInstruction
+                memory_bytes_next_instruction = fetchMemoryBytes(ProgramCounterValue, 1);
+                nextInstruction
                     = new VM252ArchitectureSpecifications.Instruction(
                     memory_bytes_next_instruction
                         );
-                nextInstruction = currentInstruction;
                 instruction_length = 1;
-                if (nextInstruction.symbolicOpcode() == "STOP"){
-                    return nextInstruction.symbolicOpcode();
-                }
             } 
-            System.out.println(currentInstruction.symbolicOpcode());
+            System.out.println(nextInstruction.symbolicOpcode());
 
                 if (instruction_length == 2) {
+
                     String symbolic_address = VM252Utilities.addressSymbolHashMap.get((int) memory_bytes_next_instruction[1]);
-                    if (symbolic_address == null && nextInstruction.symbolicOpcode() == "SET"){
-                        symbolic_address = "" + currentInstruction.numericOperand();
+
+                    if (symbolic_address == null){
+                        symbolic_address = "" + nextInstruction.numericOperand();
                     }
                     return nextInstruction.symbolicOpcode() + " " + symbolic_address;
 

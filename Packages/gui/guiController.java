@@ -5,20 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 
-import javax.swing.JTextArea;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
-
-import vm252architecturespecifications.VM252ArchitectureSpecifications;
-import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
-import vm252simulation.VM252Model.StoppedCategory;
 import vm252utilities.VM252Utilities;
 
 public class guiController
@@ -143,7 +133,7 @@ public class guiController
         private void display_instruction(){
 
             if (machineState().stoppedStatus() != VM252Model.StoppedCategory.stopped){
-            DebugFrame.instruction_to_be_executed = machineStepper().next_instruction(false, 0);
+            DebugFrame.instruction_to_be_executed = machineStepper().next_instruction(machineState().programCounter());
             DebugFrame.instruction_Display.setText(DebugFrame.instruction_to_be_executed);
             } else {
             DebugFrame.instruction_Display.setText("");
@@ -192,7 +182,7 @@ public class guiController
                                         System.out.println(e1);
                                 }
                                     // This will reset the memory_display_2 JTextArea, so need to show highlighter and breakpoints again if any
-                                    code_display_object.display_code_in_memory_bytes_format();
+                                    code_display_object.display_code_in_human_readable_format();
                                     display_instruction();
                                     lineHighlighPrinterObject().updateHighlighter();
                                 }
@@ -247,7 +237,7 @@ public class guiController
                 if (machineState().stoppedStatus()
                             == VM252Model.StoppedCategory.notStopped)
                         {machineStepper().step();
-                        code_display_object.display_code_in_memory_bytes_format();
+                        code_display_object.display_code_in_human_readable_format();
                 } else {
                 }
                 }
