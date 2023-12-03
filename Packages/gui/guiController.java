@@ -5,7 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Set;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
@@ -20,6 +22,7 @@ public class guiController
         private VM252Model myMachineState;
         private VM252Stepper myMachineStepper;
         private lineHighlightPrinter myLineHighlightPrinterObject;
+        private breakpointHandler myBreakpointHandlerObject;
         private boolean simulation_started;
         private boolean simulation_paused;
         public gui.code_display code_display_object;
@@ -33,6 +36,11 @@ public class guiController
         public lineHighlightPrinter lineHighlighPrinterObject(){
             return myLineHighlightPrinterObject;
         }
+
+        public breakpointHandler breakpointHandlerObject(){
+            return myBreakpointHandlerObject; 
+        }
+
         public VM252Model machineState()
         {
 
@@ -82,12 +90,13 @@ public class guiController
     // Public Ctors
     //
 
-        public guiController(VM252Model simulatedMachine, lineHighlightPrinter lineHighlightPrinterObject)
+        public guiController(VM252Model simulatedMachine, lineHighlightPrinter lineHighlightPrinterObject, breakpointHandler breakpointHandlerObject)
         {
             this.simulation_started = false;
             this.simulation_paused = false;
             setMachineState(simulatedMachine);
             myLineHighlightPrinterObject = lineHighlightPrinterObject;
+            myBreakpointHandlerObject = breakpointHandlerObject;
             myRunSpeed = DebugFrame.getRunSpeedFromSpeedComponent();
             create_timer();
 
@@ -184,7 +193,9 @@ public class guiController
                                     // This will reset the memory_display_2 JTextArea, so need to show highlighter and breakpoints again if any
                                     code_display_object.display_code_in_human_readable_format();
                                     display_instruction();
+                                    check_if_breakpoints_hit();
                                     lineHighlighPrinterObject().updateHighlighter();
+                                    breakpointHandlerObject().addHighlightsBack();
                                 }
                                     else stop_timer();}
                     });
@@ -215,8 +226,10 @@ public class guiController
 
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
+                    check_if_breakpoints_hit();
                     display_instruction();
                     lineHighlighPrinterObject().updateHighlighter();
+                    breakpointHandlerObject().addHighlightsBack();
                 }
 
                 }
@@ -226,8 +239,10 @@ public class guiController
                    }
                 else if (type_of_run.equals("next")){
                     do_next_instruction();
+                    check_if_breakpoints_hit();
                     display_instruction();
                     lineHighlighPrinterObject().updateHighlighter();
+                    breakpointHandlerObject().addHighlightsBack();
                 }
                 }}
 
@@ -243,5 +258,15 @@ public class guiController
                 }
         
 
+        public void check_if_breakpoints_hit(){
+            ArrayList<Integer> programCounterBreakpoints =  breakpointHandlerObject().programCounterBreakpoints;
+            // check if any breakpoints have been 
+            if (programCounterBreakpoints.contains(machineState().programCounter())){
+                // pause the simulator
+                machineState().setStoppedStatus(VM252Model.StoppedCategory.paused);
+                // remove breakpoint and update event display
+                breakpointHandlerObject().processBreakpoints(machineState().programCounter());
+            }
+        }
     }
 
