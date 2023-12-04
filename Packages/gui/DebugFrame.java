@@ -290,8 +290,20 @@ class breakpointHandler{
             }
 
         public void clearAllBreakpoints(){
+     
+        for (int line : breakpoints) {
+           removeHighlightFromLine(line);
+    }
 
-            // TO DO : SABINA
+    
+    breakpoints.clear();
+    programCounterBreakpoints.clear();
+
+    
+    memoryDisplayHighlightTags.clear();
+    inputCodeAreaHighlightTags.clear();
+
+        
 
        }
 
@@ -1301,7 +1313,7 @@ public class DebugFrame extends javax.swing.JFrame {
     }
 
     private void break_ClearActionPerformed(java.awt.event.ActionEvent evt) {                                            
-        // TODO add your handling code here:
+        breakpointHandlerObject.clearAllBreakpoints();
     }                                           
 
     private void edit_MemorybyteActionPerformed(java.awt.event.ActionEvent evt) {                                                
