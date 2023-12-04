@@ -292,21 +292,21 @@ class breakpointHandler{
 
         public void clearAllBreakpoints(){
      
-        for (int line : breakpoints) {
-           removeHighlightFromLine(line);
-    }
+                    for (int line : breakpoints) {
+                    removeHighlightFromLine(line);
+                }
 
-    
-    breakpoints.clear();
-    programCounterBreakpoints.clear();
+                
+                breakpoints.clear();
+                programCounterBreakpoints.clear();
 
-    
-    memoryDisplayHighlightTags.clear();
-    inputCodeAreaHighlightTags.clear();
+                
+                memoryDisplayHighlightTags.clear();
+                inputCodeAreaHighlightTags.clear();
 
-        
+                    
 
-       }
+                }
 
         public void reset_variables() {
 
@@ -437,6 +437,64 @@ class code_display{
                 }
             }
         }
+
+
+// Class to alter the memory address of a VM252Model
+class alter_memory_address {
+
+    
+    private final VM252Model myModel;
+    static MemoryBytePrinter memoryBytePrinterObject;
+    
+
+   
+    public alter_memory_address(VM252Model model) {
+        myModel = model; 
+                
+
+    }
+
+   
+    public void updateMemoryByte() {
+        // Prompt for memory address input from user
+        String memoryAddressInput = JOptionPane.showInputDialog("Enter Memory Address:");
+        int memoryAddress;
+        try {
+            // Attempt to parse the input string to an integer
+            memoryAddress = Integer.parseInt(memoryAddressInput);
+        } catch (NumberFormatException e) {
+            
+            JOptionPane.showMessageDialog(null, "Invalid memory address.");
+            return;
+        }
+
+        // Prompt for hexadecimal value input from user
+        String hexValueInput = JOptionPane.showInputDialog("Enter Hexadecimal Value:");
+        byte value;
+        try {
+            // Attempt to parse the input string to a byte, considering it as a hexadecimal
+            value = (byte) Integer.parseInt(hexValueInput, 16);
+        } catch (NumberFormatException e) {
+            
+            JOptionPane.showMessageDialog(null, "Invalid hexadecimal value.");
+            return;
+        }
+
+        // Attempt to update the memory byte at the given address with the new value
+        try {
+            myModel.setMemoryByte(memoryAddress, value);
+        } catch (IllegalArgumentException e) {
+            
+            JOptionPane.showMessageDialog(null, e.getMessage());
+            return;
+        }
+        System.out.println(memoryAddress);
+
+        memoryBytePrinterObject.updateMemory(memoryAddress);
+        
+    }
+}
+
 
 class lineHighlightPrinter{
 
@@ -634,6 +692,7 @@ public class DebugFrame extends javax.swing.JFrame {
     static String instruction_to_be_executed;
     static JButton button_clicked;
     public static VM252Model simulatedMachine;
+    private alter_memory_address alterMemoryAddressObject;
        
     public static Double getRunSpeedFromSpeedComponent(){
 
@@ -1302,6 +1361,8 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void edit_MemorybyteActionPerformed(java.awt.event.ActionEvent evt) {                                                
         // TODO add your handling code here:
+        alterMemoryAddressObject.updateMemoryByte();
+        
     }
     
     private void create_simulation_machine() throws IOException{
@@ -1313,6 +1374,7 @@ public class DebugFrame extends javax.swing.JFrame {
     memoryBytePrinterObject = new MemoryBytePrinter(simulatedMachine);
     lineHighlightPrinterObject = new lineHighlightPrinter(simulatedMachine, input_code_area, memory_display_two);
     breakpointHandlerObject = new breakpointHandler(input_code_area, memory_display_two);
+    alterMemoryAddressObject = new alter_memory_address(simulatedMachine);
 
     simulatedMachine.attach(accumulatorPrinterObject);
     simulatedMachine.attach(programCounterPrinterObject);
@@ -1339,7 +1401,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
 
 
-   
+
     private void selectFileActionPerformed(java.awt.event.ActionEvent evt) throws IOException{//GEN-FIRST:event_selectFileActionPerformed
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         int result = fileChooser.showOpenDialog(fileChooser);
