@@ -1,6 +1,7 @@
 package gui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,10 +11,6 @@ import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
@@ -29,7 +26,6 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import javax.swing.text.Element;
 import javax.swing.*;
-import javax.swing.ImageIcon;
 
 import vm252simulation.VM252Model;
 import vm252simulation.VM252Stepper;
@@ -38,6 +34,8 @@ import vm252utilities.VM252Utilities;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -388,23 +386,29 @@ class code_display {
 
     public void display_code_in_human_readable_format() {
 
-
-        // The idea for displaying code in human-readable format is to fetch memory bytes one after another,
+        // The idea for displaying code in human-readable format is to fetch memory
+        // bytes one after another,
         // and converting them to instructions
 
-        // If the instruction only consists of just the symbolic opcode such as STOP, INPUT, (instructions with a single word),
+        // If the instruction only consists of just the symbolic opcode such as STOP,
+        // INPUT, (instructions with a single word),
         // we will just display their symbolic code
 
-        // If the memory address we are fetching is object code that holds data, then we display what the variable name is and the data the address is storing
+        // If the memory address we are fetching is object code that holds data, then we
+        // display what the variable name is and the data the address is storing
         // which consists of 2 bytes of data
-        // The variable name is found with the help of VM252Utilities.addressesWhichHoldsObjectCodeData which is a hash map with address(PC) values as hash keys, and
+        // The variable name is found with the help of
+        // VM252Utilities.addressesWhichHoldsObjectCodeData which is a hash map with
+        // address(PC) values as hash keys, and
         // the variable name designated for that address as the values
 
-        // If the memory address we are fetching holds executable code but belongs to the VM252Utilities.addressesWhichHoldsObjectCodeData hash map
+        // If the memory address we are fetching holds executable code but belongs to
+        // the VM252Utilities.addressesWhichHoldsObjectCodeData hash map
         // , this means this is of the type (variableName : INSTRUCTION) e.g main: INPUT
-        // These are just instructions that are involved in jump statements/ while loops used to jump the PC to a certain PC value
-        // (example JUMP main) will change(jump) to wherever main is( wherever the memory address of main is)
-
+        // These are just instructions that are involved in jump statements/ while loops
+        // used to jump the PC to a certain PC value
+        // (example JUMP main) will change(jump) to wherever main is( wherever the
+        // memory address of main is)
 
         display_code_in_memory_bytes_format();
         display_entire_memory();
@@ -743,24 +747,34 @@ public class DebugFrame extends javax.swing.JFrame {
         selectFile = new javax.swing.JButton();
         file_Selected = new javax.swing.JTextField();
         JButton Help = new JButton(new ImageIcon(
-                "C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\helpicon.png"));
+                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/helpicon.png").toString()));
         Help.setBounds(100, 100, 100, 50);
         Button_Panel = new javax.swing.JPanel();
         Start = new javax.swing.JButton(new ImageIcon(
-                "C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\starticon.png"));
+                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/starticon.png").toString()));
         Start.setBounds(100, 100, 100, 50);
         Pause = new javax.swing.JButton(new ImageIcon(
-                "C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\pauseicon.png"));
+                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/pauseicon.png").toString()));
         Pause.setBounds(100, 100, 100, 50);
         next_Line = new javax.swing.JButton(new ImageIcon(
-                "C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\nexticon.png"));
+                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/nexticon.png").toString()));
         next_Line.setBounds(100, 100, 100, 100);
         executeAgain = new javax.swing.JButton(new ImageIcon(
-                "C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\reseticon.png"));
+                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/reseticon.png").toString()));
         executeAgain.setBounds(100, 100, 100, 50);
         Stop = new javax.swing.JButton(new ImageIcon(
-                "C:\\Users\\abbyw\\OneDrive\\Desktop\\CS252Project-main\\Packages\\gui\\Images\\stopicon.png"));
-        Stop.setBounds(100, 100, 100, 50);
+                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/stopicon.png").toString()));
+        ArrayList<JButton> buttonlist = new ArrayList<>(
+                Arrays.asList(Help, Start, Pause, next_Line, executeAgain, Stop));
+
+        for (JButton button : buttonlist) {
+            button.setBounds(100, 100, 100, 50);
+            button.setBorderPainted(false);
+            button.setContentAreaFilled(false);
+            button.setFocusPainted(false);
+        }
+
+        Stop.setOpaque(false);
         adjust_Speed = new javax.swing.JComboBox<>();
         Middle_Panel = new javax.swing.JPanel();
         Middle_West = new javax.swing.JPanel();
@@ -1398,6 +1412,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void HelpActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_HelpActionPerformed
         // TODO add your handling code here:
+        Path path = Paths.get(System.getProperty("user.dir"), "Packages/gui/images/helpicon.png");
     }// GEN-LAST:event_HelpActionPerformed
 
     private void AccumulatorChangeActionPerfomed(java.awt.event.ActionEvent evt) {
