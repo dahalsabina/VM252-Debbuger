@@ -1412,7 +1412,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void HelpActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_HelpActionPerformed
         // TODO add your handling code here:
-        Path path = Paths.get(System.getProperty("user.dir"), "Packages/gui/images/helpicon.png");
+         JOptionPane.showMessageDialog(this, "Select a File: You can only input an object file\n Start: Starts the code based off of input given \n Pause: Pauses code until Start is pressed \n Next Line: After a break point stops the code, user may choose to execute the next line \n Redo: Resets the currect execution \n Stop: Halts the execution and resets Speed: Adjusts the execution speed \n Breakpoints: Double click on the instruction or memory displays to have the code execute until it performs the marked instruction ","Help", JOptionPane.INFORMATION_MESSAGE);
     }// GEN-LAST:event_HelpActionPerformed
 
     private void AccumulatorChangeActionPerfomed(java.awt.event.ActionEvent evt) {
