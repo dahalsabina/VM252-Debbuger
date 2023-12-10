@@ -34,7 +34,6 @@ import vm252utilities.VM252Utilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -1412,7 +1411,7 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void HelpActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_HelpActionPerformed
         // TODO add your handling code here:
-         JOptionPane.showMessageDialog(this, "Select a File: You can only input an object file\n Start: Starts the code based off of input given \n Pause: Pauses code until Start is pressed \n Next Line: After a break point stops the code, user may choose to execute the next line \n Redo: Resets the currect execution \n Stop: Halts the execution and resets Speed: Adjusts the execution speed \n Breakpoints: Double click on the instruction or memory displays to have the code execute until it performs the marked instruction ","Help", JOptionPane.INFORMATION_MESSAGE);
+         JOptionPane.showMessageDialog(this, "Select a File: You can only input an object file\n Start: Starts the code based off of input given \n Pause: Pauses code until Start is pressed \n Next Line: After a break point stops the code, user may choose to execute the next line \n Redo: Resets the currect execution \n Stop: Halts the execution and resets Speed: Adjusts the execution speed \n Breakpoints: Double click on the instruction or memory displays to have the code execute until it performs the marked instruction \n Edit Memory:click this button to edit the memory code, when edit is ccomplete press enter \n ACC: click on the ACC text box to edit, press enter when done \n Count: click one the Count text box to edit, press enter when done. ","Help", JOptionPane.INFORMATION_MESSAGE);
     }// GEN-LAST:event_HelpActionPerformed
 
     private void AccumulatorChangeActionPerfomed(java.awt.event.ActionEvent evt) {
