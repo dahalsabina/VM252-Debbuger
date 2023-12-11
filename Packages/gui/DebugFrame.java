@@ -3,13 +3,10 @@ package gui;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Set;
-import java.util.concurrent.BrokenBarrierException;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -397,12 +394,12 @@ class code_display {
         // display what the variable name is and the data the address is storing
         // which consists of 2 bytes of data
         // The variable name is found with the help of
-        // VM252Utilities.addressesWhichHoldsObjectCodeData which is a hash map with
+        // VM252Utilities.addressSymbolHashMapwhich is a hash map with
         // address(PC) values as hash keys, and
         // the variable name designated for that address as the values
 
         // If the memory address we are fetching holds executable code but belongs to
-        // the VM252Utilities.addressesWhichHoldsObjectCodeData hash map
+        // the VM252Utilities.addressSymbolHashMapwhich array
         // , this means this is of the type (variableName : INSTRUCTION) e.g main: INPUT
         // These are just instructions that are involved in jump statements/ while loops
         // used to jump the PC to a certain PC value
@@ -415,7 +412,6 @@ class code_display {
 
         int programCounter = 0;
         String instruction = myStepper.next_instruction(programCounter);
-        Instruction raw_instruction = myStepper.get_raw_instruction(programCounter);
         int instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
 
         while (programCounter < VM252Utilities.byteContentMapSize) {
@@ -446,7 +442,6 @@ class code_display {
 
             instruction_length_in_bytes = myStepper.get_instruction_bytes_length(programCounter);
             instruction = myStepper.next_instruction(programCounter);
-            raw_instruction = myStepper.get_raw_instruction(programCounter);
 
         }
     }
@@ -849,24 +844,28 @@ public class DebugFrame extends javax.swing.JFrame {
                 StartActionPerformed(evt);
             }
         });
+        Start.setToolTipText("Run simulation");
 
         Pause.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 PauseActionPerformed(evt);
             }
         });
+        Pause.setToolTipText("Pause simulation");
 
         next_Line.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 NextActionPerformed(evt);
             }
         });
+        next_Line.setToolTipText("Execute next instruction");
 
         executeAgain.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 executeAgainActionPerformed(evt);
             }
         });
+        executeAgain.setToolTipText("Restart simulation (Discards changes made)");
 
         adjust_Speed.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -882,6 +881,7 @@ public class DebugFrame extends javax.swing.JFrame {
                 stopActionPerformed(evt);
             }
         });
+        Stop.setToolTipText("Stop simulation");
 
         adjust_Speed.setModel(new javax.swing.DefaultComboBoxModel<>(
                 new String[] { "Speed ∞", "Speed x1.0", "Speed x0.75", "Speed x0.5", "Speed x0.25" }));
@@ -1411,7 +1411,9 @@ public class DebugFrame extends javax.swing.JFrame {
 
     private void HelpActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_HelpActionPerformed
         // TODO add your handling code here:
-         JOptionPane.showMessageDialog(this, "Select a File: You can only input an object file\n Start: Starts the code based off of input given \n Pause: Pauses code until Start is pressed \n Next Line: After a break point stops the code, user may choose to execute the next line \n Redo: Resets the currect execution \n Stop: Halts the execution and resets Speed: Adjusts the execution speed \n Breakpoints: Double click on the instruction or memory displays to have the code execute until it performs the marked instruction \n Edit Memory:click this button to edit the memory code, when edit is ccomplete press enter \n ACC: click on the ACC text box to edit, press enter when done \n Count: click one the Count text box to edit, press enter when done. ","Help", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this,
+                "Select a File: You can only input an object file\n Start: Starts the code based off of input given \n Pause: Pauses code until Start is pressed \n Next Line: After a break point stops the code, user may choose to execute the next line \n Redo: Resets the currect execution \n Stop: Halts the execution and resets Speed: Adjusts the execution speed \n Breakpoints: Double click on the instruction or memory displays to have the code execute until it performs the marked instruction ",
+                "Help", JOptionPane.INFORMATION_MESSAGE);
     }// GEN-LAST:event_HelpActionPerformed
 
     private void AccumulatorChangeActionPerfomed(java.awt.event.ActionEvent evt) {
