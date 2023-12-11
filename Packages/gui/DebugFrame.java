@@ -1089,7 +1089,7 @@ public class DebugFrame extends javax.swing.JFrame {
                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(37, 37, 37)));
 
-        break_Clear.setText("Clear Breakpounts");
+        break_Clear.setText("Clear Breakpoints");
         break_Clear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 break_ClearActionPerformed(evt);
