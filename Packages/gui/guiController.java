@@ -1,27 +1,12 @@
 package gui;
 
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.text.AbstractDocument;
-
-import javax.swing.JTextArea;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
-import javax.swing.text.Highlighter;
 
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
 import vm252simulation.VM252Model;
@@ -38,7 +23,6 @@ public class guiController {
     private lineHighlightPrinter myLineHighlightPrinterObject;
     private breakpointHandler myBreakpointHandlerObject;
     private boolean simulation_started;
-    private boolean simulation_paused;
     public gui.code_display code_display_object;
     private javax.swing.Timer timer;
     private double myRunSpeed;
@@ -99,7 +83,6 @@ public class guiController {
     public guiController(VM252Model simulatedMachine, lineHighlightPrinter lineHighlightPrinterObject,
             breakpointHandler breakpointHandlerObject) {
         this.simulation_started = false;
-        this.simulation_paused = false;
         setMachineState(simulatedMachine);
         myLineHighlightPrinterObject = lineHighlightPrinterObject;
         myBreakpointHandlerObject = breakpointHandlerObject;
@@ -219,7 +202,6 @@ public class guiController {
         if (this.simulation_started == false) {
 
             this.simulation_started = true;
-            this.simulation_paused = false;
             // Simulate execution of the object code until the simulated machine
             // executes a STOP instruction
             //

@@ -2,8 +2,6 @@ package gui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,17 +9,11 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import vm252architecturespecifications.VM252ArchitectureSpecifications;
-import vm252architecturespecifications.VM252ArchitectureSpecifications.Instruction;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import javax.swing.text.Element;
 import javax.swing.*;
 
 import vm252simulation.VM252Model;
@@ -34,7 +26,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 
 /**
  * 
@@ -506,33 +497,45 @@ public class DebugFrame extends javax.swing.JFrame {
         Upper_Panel = new javax.swing.JPanel();
         selectFile = new javax.swing.JButton();
         file_Selected = new javax.swing.JTextField();
-        JButton Help = new JButton(new ImageIcon(
-                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/helpicon.png").toString()));
+        // Help = new JButton(new ImageIcon(
+        // Paths.get(System.getProperty("user.dir"),
+        // "Packages/gui/images/helpicon.png").toString()));
+        Help = new JButton("Help");
         Help.setBounds(100, 100, 100, 50);
         Button_Panel = new javax.swing.JPanel();
-        Start = new javax.swing.JButton(new ImageIcon(
-                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/starticon.png").toString()));
+        // Start = new javax.swing.JButton(new ImageIcon(
+        // Paths.get(System.getProperty("user.dir"),
+        // "Packages/gui/images/starticon.png").toString()));
+        Start = new JButton("Start");
         Start.setBounds(100, 100, 100, 50);
-        Pause = new javax.swing.JButton(new ImageIcon(
-                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/pauseicon.png").toString()));
+        // Pause = new javax.swing.JButton(new ImageIcon(
+        // Paths.get(System.getProperty("user.dir"),
+        // "Packages/gui/images/pauseicon.png").toString()));
+        Pause = new JButton("Pause");
         Pause.setBounds(100, 100, 100, 50);
-        next_Line = new javax.swing.JButton(new ImageIcon(
-                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/nexticon.png").toString()));
+        // next_Line = new javax.swing.JButton(new ImageIcon(
+        // Paths.get(System.getProperty("user.dir"),
+        // "Packages/gui/images/nexticon.png").toString()));
+        next_Line = new JButton("Next instruction");
         next_Line.setBounds(100, 100, 100, 100);
-        executeAgain = new javax.swing.JButton(new ImageIcon(
-                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/reseticon.png").toString()));
+        // executeAgain = new javax.swing.JButton(new ImageIcon(
+        // Paths.get(System.getProperty("user.dir"),
+        // "Packages/gui/images/reseticon.png").toString()));
+        executeAgain = new JButton("Execute Again");
         executeAgain.setBounds(100, 100, 100, 50);
-        Stop = new javax.swing.JButton(new ImageIcon(
-                Paths.get(System.getProperty("user.dir"), "Packages/gui/images/stopicon.png").toString()));
+        // Stop = new javax.swing.JButton(new ImageIcon(
+        // Paths.get(System.getProperty("user.dir"),
+        // "Packages/gui/images/stopicon.png").toString()));
+        Stop = new JButton("Stop");
         ArrayList<JButton> buttonlist = new ArrayList<>(
                 Arrays.asList(Help, Start, Pause, next_Line, executeAgain, Stop));
 
-        for (JButton button : buttonlist) {
-            button.setBounds(100, 100, 100, 50);
-            button.setBorderPainted(false);
-            button.setContentAreaFilled(false);
-            button.setFocusPainted(false);
-        }
+        // for (JButton button : buttonlist) {
+        // button.setBounds(100, 100, 100, 50);
+        // button.setBorderPainted(false);
+        // button.setContentAreaFilled(false);
+        // button.setFocusPainted(false);
+        // }
 
         Stop.setOpaque(false);
         adjust_Speed = new javax.swing.JComboBox<>();
@@ -563,7 +566,7 @@ public class DebugFrame extends javax.swing.JFrame {
         memory_options_one = new javax.swing.JComboBox<>();
         memory_display_scroll_one = new javax.swing.JScrollPane();
         memory_display_one = new javax.swing.JTextArea();
-        Last_Bottom_East = new javax.swing.JPanel();
+        new javax.swing.JPanel();
         memory_display_scroll_two = new javax.swing.JScrollPane();
         memory_display_two = new javax.swing.JTextArea();
 
@@ -1108,11 +1111,10 @@ public class DebugFrame extends javax.swing.JFrame {
                                                 javax.swing.GroupLayout.PREFERRED_SIZE))));
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void file_SelectedActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_file_SelectedActionPerformed
-        // TODO add your handling code here:
-    }// GEN-LAST:event_file_SelectedActionPerformed
+    }
 
     private void memory_options_oneActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_memory_options_oneActionPerformed
 
@@ -1126,8 +1128,7 @@ public class DebugFrame extends javax.swing.JFrame {
             code_display_object.typeOfDisplay = "bytes";
             code_display_object.display_entire_memory();
         }
-        // TODO add your handling code here:
-    }// GEN-LAST:event_memory_options_oneActionPerformed
+    }
 
     private void NextActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_StartActionPerformed
         try {
@@ -1145,8 +1146,7 @@ public class DebugFrame extends javax.swing.JFrame {
         } catch (IOException e) {
             System.out.println("IO Exception");
         }
-        // TODO add your handling code here:
-    }// GEN-LAST:event_StartActionPerformed
+    }
 
     private void PauseActionPerformed(ActionEvent evt) {
         if (file_Selected.getText().equals("No file selected")) {
@@ -1172,15 +1172,13 @@ public class DebugFrame extends javax.swing.JFrame {
         } catch (IOException e) {
             System.out.println("IO Exception");
         }
-        // TODO add your handling code here:
-    }// GEN-LAST:event_StartActionPerformed
+    }
 
     private void HelpActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_HelpActionPerformed
-        // TODO add your handling code here:
         JOptionPane.showMessageDialog(this,
                 "Select a File: You can only input an object file\n Start: Starts the code based off of input given \n Pause: Pauses code until Start is pressed \n Next Line: After a break point stops the code, user may choose to execute the next line \n Redo: Resets the currect execution \n Stop: Halts the execution and resets Speed: Adjusts the execution speed \n Breakpoints: Double click on the instruction or memory displays to have the code execute until it performs the marked instruction ",
                 "Help", JOptionPane.INFORMATION_MESSAGE);
-    }// GEN-LAST:event_HelpActionPerformed
+    }
 
     private void AccumulatorChangeActionPerfomed(java.awt.event.ActionEvent evt) {
         String new_value = accumulator_display.getText();
@@ -1275,12 +1273,11 @@ public class DebugFrame extends javax.swing.JFrame {
         try {
             create_simulation_machine();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         reset_gui_components(true);
 
-    }// GEN-LAST:event_executeAgainActionPerformed
+    }
 
     private void stopActionPerformed(ActionEvent evt) {
 
@@ -1290,13 +1287,12 @@ public class DebugFrame extends javax.swing.JFrame {
     }
 
     private void count_diplayActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_count_diplayActionPerformed
-        // TODO add your handling code here:
         String new_value = count_diplay.getText();
         programCounterPrinterObject.setProgramCounter(Integer.parseInt(new_value));
         DebugFrame.event_display
                 .setText(DebugFrame.event_display.getText() + "PC set to " + Integer.parseInt(new_value) + "\n");
 
-    }// GEN-LAST:event_count_diplayActionPerformed
+    }
 
     /**
      * @param args the command line arguments
@@ -1349,7 +1345,6 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JPanel Center_Bottom_East;
     private javax.swing.JButton Help;
     private javax.swing.JLabel Output_Value;
-    private javax.swing.JPanel Last_Bottom_East;
     private javax.swing.JPanel Middle_Center;
     private javax.swing.JPanel Middle_East;
     private javax.swing.JPanel Middle_Panel;
@@ -1386,11 +1381,6 @@ public class DebugFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane output_scroll;
     private javax.swing.JButton selectFile;
     // End of variables declaration//GEN-END:variables
-
-    private Scanner Scanner(String input_value) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from
-                                                                       // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 
     public static void update_event_display() {
         String output_line_1 = String.format("INPUT %d given | ACC : %d | PC : %d", simulatedMachine.accumulator(),

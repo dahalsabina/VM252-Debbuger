@@ -168,7 +168,6 @@ class breakpointHandler {
             }
 
         } catch (Exception e) {
-            // TODO: handle exception
         }
     }
 
